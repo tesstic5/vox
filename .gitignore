@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnp.*
+.yarn/install-state.gz
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# The file-backed store, its backups, and anything else the app writes at run time.
+# The demo workspace lives here (37 MB and growing), so it is a local artefact, not
+# source: a fresh clone boots empty and the onboarding flow makes a workspace.
+data/
+
+# Environment — real values never leave the machine; .env.example is the template
+.env
+.env.*
+!.env.example
+
+# Test and tooling artefacts
+coverage/
+playwright-report/
+test-results/
+/tmp/
+.cache/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log
+npm-debug.log*

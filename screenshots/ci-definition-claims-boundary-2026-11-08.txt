@@ -1,0 +1,6 @@
+PASS gates: 7 required CI contracts present
+PASS postgres: 6 required CI contracts present
+PASS browser: 6 required CI contracts present
+PASS docker: 8 required CI contracts present
+PASS workflow YAML parsed with four jobs: gates, postgres, browser, docker
+STATIC CI DEFINITION INSPECTION PASS — hosted execution and Docker runtime remain unproven locally.

@@ -1,0 +1,1 @@
+import { NextResponse } from 'next/server'; export function GET(){return new NextResponse('<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Voxera implementation updates</title><link>/docs</link><description>No verified editorial feed is published.</description></channel></rss>',{headers:{'content-type':'application/rss+xml; charset=utf-8'}});}

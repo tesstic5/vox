@@ -1,0 +1,3 @@
+import { Section } from '@/components/ui';
+export const metadata={title:'Careers',description:'No verified open roles are published by this deployment.'};
+export default function CareersPage(){return <Section className="pb-20 pt-20"><div className="container-wide max-w-3xl"><div className="eyebrow mb-4">Careers</div><h1 className="h1 text-balance">No verified openings are published.</h1><p className="lede mt-6">Sample job listings, locations, benefits and hiring claims have been removed. The operator can publish real roles here when an accountable hiring organisation and contact process exist.</p></div></Section>}

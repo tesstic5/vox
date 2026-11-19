@@ -1,0 +1,252 @@
+@import "tailwindcss";
+/* The v3 JS config still carries the theme (colours, fonts, shadows);
+   v4 loads it verbatim through the legacy-config directive. */
+@config "../tailwind.config.ts";
+
+/* Defined as a v4 utility (not a plain component class) so the button
+   variants below can still `@apply btn …` — v4 only allows applying
+   utilities, and this is usable as a class in markup exactly as before. */
+@utility btn {
+  @apply inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-full text-[13.5px] font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-45;
+}
+
+:root {
+  --bg: 5 7 6;
+  --panel: 10 14 12;
+  --edge: 255 255 255;
+  --brand: 43 227 139;
+  --font-sans: system-ui;
+  --font-mono: ui-monospace;
+}
+
+/* No global border-color rule: a leftover `* { border-color: rgba(var(--edge),…) }`
+   was invalid CSS (space-separated var + comma alpha) that won the cascade over
+   every Tailwind border utility and then fell back to currentColor — which is
+   why every border rendered as solid dark text colour. Border colours are set
+   per-element by utilities now. */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply text-slateink-200 antialiased;
+  background:
+    radial-gradient(1100px 500px at 85% -10%, rgba(43, 227, 139, 0.07), transparent 60%),
+    radial-gradient(900px 480px at -10% 0%, rgba(120, 180, 255, 0.05), transparent 55%),
+    linear-gradient(180deg, #f8faf9 0%, #f3f7f4 100%);
+  background-attachment: fixed;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(43, 227, 139, 0.35);
+  color: #0b2e1f;
+}
+
+/* ---------- scrollbars ---------- */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #e8edea;
+}
+::-webkit-scrollbar-thumb {
+  background: #c2cfc8;
+  border-radius: 99px;
+  border: 2px solid #e8edea;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a9bcb1;
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-[1240px] px-5 sm:px-8;
+  }
+  .container-wide {
+    @apply mx-auto w-full max-w-[1440px] px-5 sm:px-8;
+  }
+
+  .h1 {
+    @apply font-sans text-[2.6rem] font-semibold leading-[1.03] tracking-[-0.035em] text-slate-900 sm:text-6xl lg:text-[4.25rem];
+  }
+  .h2 {
+    @apply font-sans text-[2rem] font-semibold leading-[1.06] tracking-[-0.03em] text-slate-900 sm:text-[2.6rem] lg:text-[3.1rem];
+  }
+  .h3 {
+    @apply font-sans text-xl font-semibold tracking-[-0.02em] text-slate-900 sm:text-2xl;
+  }
+  .h4 {
+    @apply font-sans text-base font-semibold tracking-[-0.01em] text-slate-900;
+  }
+  .eyebrow {
+    @apply font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-brand-700;
+  }
+  .lede {
+    @apply text-[17px] leading-relaxed text-slateink-400 sm:text-lg;
+  }
+  .body-sm {
+    @apply text-[13.5px] leading-relaxed text-slateink-400;
+  }
+
+  .panel {
+    @apply rounded-2xl border border-slate-900/[0.045] bg-ink-850/80 backdrop-blur-sm;
+  }
+  .panel-hover {
+    @apply transition-colors duration-300 hover:border-slate-900/[0.045] hover:bg-ink-800/80;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-slate-900/[0.05] bg-slate-900/[0.03] px-2.5 py-1 font-mono text-[10.5px] font-medium uppercase tracking-[0.14em] text-slateink-300;
+  }
+  .badge-brand {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-brand-500/25 bg-brand-500/[0.08] px-2.5 py-1 font-mono text-[10.5px] font-medium uppercase tracking-[0.14em] text-brand-700;
+  }
+
+  .btn-primary {
+    @apply btn bg-slate-900 px-5 py-2.5 text-white shadow-[0_8px_24px_-10px_rgba(16,40,30,0.45)] hover:bg-slate-700 hover:shadow-[0_12px_32px_-10px_rgba(16,40,30,0.4)];
+  }
+  .btn-brand {
+    @apply btn bg-brand-400 px-5 py-2.5 text-[#03150D] hover:bg-brand-300 hover:shadow-[0_10px_40px_-12px_rgba(43,227,139,0.85)];
+  }
+  .btn-ghost {
+    @apply btn border border-slate-900/[0.045] bg-slate-900/[0.02] px-5 py-2.5 text-slate-900 hover:border-slate-900/[0.05] hover:bg-slate-900/[0.06];
+  }
+  .btn-danger {
+    @apply btn border border-rose-400/30 bg-rose-500/[0.12] px-5 py-2.5 text-rose-700 hover:border-rose-400/50 hover:bg-rose-500/20;
+  }
+  .btn-quiet {
+    @apply btn px-3.5 py-2 text-slateink-300 hover:bg-slate-900/[0.05] hover:text-slate-900;
+  }
+  .btn-sm {
+    @apply px-3.5 py-2 text-[12.5px];
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-slate-900/[0.035] bg-ink-900/80 px-3.5 py-2.5 text-[13.5px] text-slate-900 placeholder:text-slateink-400 focus:border-brand-500/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20;
+  }
+  .label {
+    @apply mb-1.5 block font-mono text-[10.5px] font-medium uppercase tracking-[0.16em] text-slateink-400;
+  }
+
+  .hairline {
+    @apply h-px w-full bg-gradient-to-r from-transparent via-slate-900/[0.06] to-transparent;
+  }
+  .bg-grid {
+    background-image: radial-gradient(rgba(22, 33, 28, 0.07) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  .grid-bg {
+    background-image: linear-gradient(to bottom, rgba(22, 33, 28, 0.05) 1px, transparent 1px),
+      linear-gradient(to right, rgba(22, 33, 28, 0.05) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+  .glow-top {
+    background: radial-gradient(120% 80% at 50% -20%, rgba(43, 227, 139, 0.16), transparent 60%);
+  }
+  .text-gradient {
+    @apply bg-gradient-to-b from-slate-900 to-slate-900/55 bg-clip-text text-transparent;
+  }
+  .code-chip {
+    @apply rounded-md border border-slate-900/[0.035] bg-ink-950 px-1.5 py-0.5 font-mono text-[12px] text-brand-700;
+  }
+  .divider-y {
+    @apply divide-y divide-slate-900/[0.035];
+  }
+}
+
+@layer utilities {
+  .mask-fade-x {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  }
+  .mask-fade-b {
+    -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent);
+    mask-image: linear-gradient(to bottom, black 55%, transparent);
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* keyboard focus: a single visible ring everywhere, offset so it clears the element */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid rgb(var(--brand) / 0.72);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+:where(.btn-primary, .btn-brand, .btn-ghost, .btn-quiet, .btn-danger):focus-visible {
+  outline-offset: 3px;
+}
+
+/* reveal-on-scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* prose for blog / legal */
+.prose-vox {
+  @apply text-[16px] leading-[1.75] text-slateink-300;
+}
+.prose-vox h2 {
+  @apply mb-3 mt-12 text-2xl font-semibold tracking-[-0.02em] text-slate-900;
+}
+.prose-vox h3 {
+  @apply mb-2 mt-9 text-lg font-semibold text-slate-900;
+}
+.prose-vox p {
+  @apply mb-5;
+}
+.prose-vox a {
+  @apply text-brand-700 underline decoration-brand-500/40 underline-offset-4 hover:decoration-brand-400;
+}
+.prose-vox ul {
+  @apply mb-5 list-disc space-y-2 pl-5 marker:text-brand-500/70;
+}
+.prose-vox ol {
+  @apply mb-5 list-decimal space-y-2 pl-5 marker:text-brand-500/70;
+}
+.prose-vox blockquote {
+  @apply mb-6 border-l-2 border-brand-500/50 pl-5 text-lg italic text-slate-900/90;
+}
+.prose-vox strong {
+  @apply font-semibold text-slate-900;
+}
+.prose-vox code {
+  @apply rounded-md border border-slate-900/[0.035] bg-ink-950 px-1.5 py-0.5 font-mono text-[13px] text-brand-700;
+}
+.prose-vox pre {
+  @apply mb-6 overflow-x-auto rounded-2xl border border-slate-900/[0.045] bg-ink-950 p-4 text-[12.5px] leading-relaxed;
+}
+.prose-vox pre code {
+  @apply border-0 bg-transparent p-0 text-slateink-300;
+}
+.prose-vox hr {
+  @apply my-10 border-slate-900/[0.045];
+}

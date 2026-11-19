@@ -1,0 +1,4 @@
+import { LinkButton, Section } from '@/components/ui';
+
+export const metadata={title:'Legal boundary',description:'No template agreement is represented as an executed contract.'};
+export default function LegalPage(){return <Section className="pb-20 pt-16 sm:pt-24"><div className="container-wide max-w-3xl"><div className="eyebrow mb-4">Legal</div><h1 className="h1 text-balance">Repository pages are not signed agreements.</h1><p className="lede mt-6">Sample SLA, DPA, BAA, security-addendum and subprocessor claims have been removed. The operator of a real deployment must publish reviewed terms, privacy disclosures, provider lists and jurisdiction-specific agreements before production use.</p><div className="mt-8 flex flex-wrap gap-3"><LinkButton href="/privacy" variant="brand">Read the data boundary</LinkButton><LinkButton href="/terms-of-service" variant="ghost">Read use terms</LinkButton></div></div></Section>}

@@ -1,0 +1,12 @@
+
+> voxera@1.0.0 check:resend-webhook
+> node scripts/resend-webhook-check.mjs
+
+PASS  a forged Resend callback is refused — HTTP 400
+PASS  a stale but correctly signed Resend callback is refused — HTTP 400
+PASS  an oversized Resend callback is refused before parsing — HTTP 413
+PASS  a chunked oversized callback is bounded without trusting Content-Length — HTTP 413
+PASS  a valid signed callback is accepted without inventing a message match — HTTP 200 {"ok":true,"matched":false,"recorded":"no_change"}
+PASS  replaying the same signed Svix id is idempotent — HTTP 200 {"ok":true,"duplicate":true}
+
+6 PASS / 0 FAIL

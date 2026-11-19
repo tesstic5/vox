@@ -1,0 +1,20 @@
+
+> voxera@1.0.0 check:email-provider
+> tsx scripts/email-provider-check.ts
+
+PASS  the generic relay returns its provider id — {"ok":true,"id":"email_1"}
+PASS  the generic relay preserves its documented metadata contract — {"from":"Voxera Pilot <pilot@example.test>","to":"generic@example.test","subject":"generic","text":"Generic relay body","metadata":{"messageId":"msg_1","orgId":"org_1"}}
+PASS  the Resend adapter returns the accepted message id — {"ok":true,"id":"email_2"}
+PASS  the Resend adapter uses Bearer authentication — Bearer email-provider-check-key
+PASS  the Resend adapter deduplicates queue retries with the durable message id — voxera-message/msg:unsafe/value
+PASS  the Resend adapter removes unsupported generic metadata — {"from":"Voxera Pilot <pilot@example.test>","to":"resend@example.test","subject":"resend","text":"Resend body","tags":[{"name":"messageId","value":"msg-unsafe-value"},{"name":"orgId","value":"org_2"}]}
+PASS  the Resend adapter emits provider-native safe tags — [{"name":"messageId","value":"msg-unsafe-value"},{"name":"orgId","value":"org_2"}]
+PASS  a correctly signed Resend webhook verifies against the raw body
+PASS  a Resend hard bounce becomes a terminal failure and consent withdrawal — {"status":"failed","reason":"mailbox unavailable","withdrawConsent":true}
+PASS  a temporary bounce fails this attempt without withdrawing future consent — {"status":"failed","reason":"mailbox temporarily unavailable","withdrawConsent":false}
+PASS  a forged Resend signature is refused
+PASS  a stale Resend webhook is refused before processing
+PASS  a provider rejection remains a failure with its reason — {"ok":false,"reason":"sender domain is not verified"}
+PASS  missing email configuration never pretends to deliver — {"ok":false,"reason":"no email relay configured (set VOXERA_EMAIL_API_BASE)"}
+
+14 PASS / 0 FAIL

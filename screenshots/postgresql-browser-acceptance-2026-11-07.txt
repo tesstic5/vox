@@ -1,0 +1,47 @@
+Voxera PostgreSQL browser and accessibility acceptance
+======================================================
+Date: 2026-11-07
+Runtime: exact optimized Next.js 16.4.3 build, PostgreSQL 17.11, loopback production server
+Database: fresh count-and-digest-verified migration of 124,462 documents across 59 collections
+Browser tooling: isolated Playwright 1.64.1 + Chromium 156; not added to the repository dependency tree
+
+Interaction walks
+-----------------
+Command: npm run check:browser
+Result: 5/5 walks green; 141/141 checks passed; 0 failed
+- Dashboard console sweep: 55/55 routes
+- Practitioner day: 41/41
+- Calendar drag and timezone behavior: 14/14
+- Classes desk/public journey: 23/23
+- Contractor desktop/mobile workflow: 8/8
+
+Desktop browser quality and accessibility
+-----------------------------------------
+Command: node scripts/browser-quality-check.mjs
+Result: 18/18 representative routes passed
+Axe WCAG A/AA violations: 0 on every route
+No failed same-origin requests, HTTP errors, repeated API reads, resource-budget failures, or local-load-budget failures.
+Artifact: screenshots/browser-quality-check.desktop.json
+
+Mobile browser quality and accessibility
+----------------------------------------
+Command: node scripts/browser-quality-check.mjs --mobile
+Result: 18/18 representative routes passed
+Axe WCAG A/AA violations: 0 on every route
+No failed same-origin requests, HTTP errors, repeated API reads, resource-budget failures, or local-load-budget failures.
+Artifact: screenshots/browser-quality-check.mobile.json
+
+Supporting artifacts
+--------------------
+- screenshots/dashboard-console-sweep.json
+- screenshots/field-ui-check.json
+- screenshots/a6-my-day-phone.png
+- screenshots/a6-my-day-phone-unlinked.png
+- screenshots/a6-my-day-desktop.png
+- screenshots/d1-calendar-drag.png
+- screenshots/classes-desk.png
+- screenshots/classes-public.png
+
+Boundary
+--------
+This closes the local PostgreSQL real-browser and automated WCAG route gate. It does not prove the shipped Docker image, a public Dokploy/Traefik hostname, assistive-technology usability, or an independent accessibility review.

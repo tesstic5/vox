@@ -1,0 +1,39 @@
+
+> voxera@1.0.0 store:backup
+> tsx scripts/backup-store.ts .restore-drill-tmp --keep 2
+
+backed up PostgreSQL 5.9 MB → /home/user/voxera/.restore-drill-tmp/voxera-postgres.2026-11-08T12-45-27-343Z.dump
+sha256 76e4aec968ab824a533d2d86fd79abc4fa81cf26648d55f1203a7ad4e459d9c3
+1 scheduled copy(ies) kept in /home/user/voxera/.restore-drill-tmp (--keep 2)
+
+> voxera@1.0.0 store:restore
+> tsx scripts/restore-store.ts .restore-drill-tmp/voxera-postgres.2026-11-08T12-45-27-343Z.dump --check
+
+  checksum sidecar: verified
+backup /home/user/voxera/.restore-drill-tmp/voxera-postgres.2026-11-08T12-45-27-343Z.dump
+  5.9 MB · sha256 76e4aec968ab824a533d2d86fd79abc4fa81cf26648d55f1203a7ad4e459d9c3
+  archive TOC: 15 object(s), 2 table-data section(s)
+  target: PostgreSQL 17 · client tools 17
+
+--check only: archive parsed and checksum verified; nothing was changed.
+
+> voxera@1.0.0 store:restore
+> tsx scripts/restore-store.ts .restore-drill-tmp/voxera-postgres.2026-11-08T12-45-27-343Z.dump --apply --confirm-postgres=REPLACE_POSTGRES_TARGET
+
+  checksum sidecar: verified
+backup /home/user/voxera/.restore-drill-tmp/voxera-postgres.2026-11-08T12-45-27-343Z.dump
+  5.9 MB · sha256 76e4aec968ab824a533d2d86fd79abc4fa81cf26648d55f1203a7ad4e459d9c3
+  archive TOC: 15 object(s), 2 table-data section(s)
+  target: PostgreSQL 17 · client tools 17
+
+creating reversible pre-restore backup → /home/user/voxera/.restore-drill-tmp/voxera-postgres.before-restore-2026-11-08T12-45-39-874Z.dump
+
+restored PostgreSQL archive: 126670 documents across 64 collections
+target read check: ok
+pre-restore target retained at /home/user/voxera/.restore-drill-tmp/voxera-postgres.before-restore-2026-11-08T12-45-39-874Z.dump
+start the app, check /api/health, and run the staging acceptance suite before relying on the restore.
+
+ordered source/scratch comparison
+voxera_app_test: 126670 documents / 64 collections · sha256 32f8598708677a10af704a8166cf8a48c3cf3b09bc87fc65988dc25d5a0404e7
+voxera_restore_test: 126670 documents / 64 collections · sha256 32f8598708677a10af704a8166cf8a48c3cf3b09bc87fc65988dc25d5a0404e7
+scratch restore matches source exactly

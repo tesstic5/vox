@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voxera — What it can and cannot do</title>
+<style>
+  :root{--ink:#10130f;--muted:#5c665a;--line:#dfe5d8;--bg:#f4f6f0;--card:#ffffff;--green:#1f7a4d;--green-bg:#e7f4ec;--red:#9c3a2d;--red-bg:#f9ecea;--accent:#57e6a3}
+  *{box-sizing:border-box} body{margin:0;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+  header{background:#12160f;color:#eef4ea;padding:48px 24px 40px}
+  header .brand{font-size:15px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+  header h1{margin:10px 0 8px;font-size:36px;line-height:1.15;max-width:760px}
+  header p{margin:0;color:#b9c4b2;max-width:760px}
+  main{max-width:900px;margin:0 auto;padding:28px 20px 60px}
+  section{margin:26px 0} h2{font-size:22px;margin:0 0 4px} h2 .sub{display:block;font-size:13px;color:var(--muted);font-weight:400;margin-top:3px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:14px 0}
+  ul{margin:8px 0;padding-left:20px} li{margin:5px 0} strong{font-weight:650}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14.5px}
+  th{background:#eef2e8;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+  tr:last-child td{border-bottom:none}
+  .yes h2{color:var(--green)} .no h2{color:var(--red)}
+  .pill{display:inline-block;background:var(--green-bg);color:var(--green);border-radius:99px;padding:2px 10px;font-size:12px;font-weight:600}
+  .pill.red{background:var(--red-bg);color:var(--red)}
+  .note{background:#fff8e6;border:1px solid #eadfae;border-radius:12px;padding:14px 18px;font-size:14px}
+  footer{color:var(--muted);font-size:13px;text-align:center;padding:0 20px 40px}
+  @media print{body{background:#fff} header{-webkit-print-color-adjust:exact;print-color-adjust:exact} .card,table{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Voxera</div>
+  <h1>What Voxera can — and cannot — do</h1>
+  <p>An honest feature list. Everything under “can do” is a working page, route, or tool in the product, verified by an automated test suite (37 test gates, 1,464 checks, all passing). Everything under “cannot do” is stated plainly, with what exists instead.</p>
+</header>
+<main>
+
+<section class="yes">
+  <h2>✅ What it can do</h2>
+
+  <div class="card">
+    <h3>📞 Phone &amp; AI assistants</h3>
+    <ul>
+      <li>Answer inbound calls and run appointments end-to-end: check availability, book, reschedule, cancel, send confirmations, create payment links, transfer, draft notes</li>
+      <li>Outbound dialling with attempt budgets, quiet hours, and do-not-call enforcement</li>
+      <li>Assistants with versioned configuration (model, voice, prompt, tools), publish and rollback</li>
+      <li><strong>Squads</strong> — assistants handing off mid-call with a written brief; <strong>Workflows</strong> for steps that must not be improvised; <strong>Tools &amp; MCP</strong> servers allowlisted per assistant and enforced at runtime</li>
+      <li>Knowledge base the assistant answers from, traced back to its source</li>
+      <li>Evals, simulations with synthetic callers, a live API playground, and batch <strong>campaigns</strong> with cost estimated before dialling</li>
+      <li>Phone numbers: buy, or bring your own carrier (credentials encrypted and verified on connect); live transcripts and per-call cost</li>
+      <li>Team members can ring in and ask the assistant for practice figures — recognised by their mobile, refused politely if unknown</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>🏥 Practice management</h3>
+    <ul>
+      <li><strong>Diary</strong> — day / 3-day / work-week / week views, drag to move, resize to extend, filters by practitioner and site, privacy mode with masked client names</li>
+      <li><strong>Availability engine</strong> — rota, holidays, one-off changes, buffers, per-practitioner timezones, rooms: one source of truth the diary and the AI both use</li>
+      <li><strong>Classes &amp; group sessions</strong> — capacity, weekly runs, “places left” on the public page, a register with Arrived / Done / No-show per seat, and a wait-list that texts the front of the line a one-tap claim link when a place frees</li>
+      <li>Repeat series, appointment statuses, wait-list for private appointments, freed slots offered by text/email with single-use links</li>
+      <li><strong>Clients</strong> — timeline, alerts, consents, a per-record access log (who opened whose record), CSV import (dry-run first) and export; records are always read from the server, never cached in the browser</li>
+      <li><strong>Notes</strong> — per-service templates, incomplete flags, attachments, finalise-then-amend (finalised notes cannot be silently edited); receptionists cannot open clinical notes</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>💬 Messaging, money &amp; public booking</h3>
+    <ul>
+      <li>SMS + email templates and rules (reminders, follow-ups, no-show chasing) with a sending window — nothing goes out at 3am; replies act: “yes” confirms, “no” cancels, “Thursday?” files a change request for the desk</li>
+      <li><strong>Class packs</strong> — places paid for up front (“10 classes for $200”): booking holds a place, attending spends it, a late cancel or no-show burns it, an early one gives it back; unspent places can be refunded, packs extended or transferred — and the money is tracked as a liability until each class happens</li>
+      <li><strong>Invoices</strong> from visits, draft → issued → paid / part-paid / overdue / void; payments, part payments, refunds, prepayments, credits, statements, expenses, revenue by practitioner</li>
+      <li>Public pay links, a per-practice online booking page, and a <strong>client’s own link</strong> to view, confirm, reschedule, cancel, and self-check-in</li>
+      <li><strong>Reports</strong> — revenue by practitioner and service, utilisation, no-show rate, recalls, booking sources, with CSV export; analytics with a real CSV download; a whole-workspace JSON export with secrets redacted</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>🔧 Accounts, team &amp; sales</h3>
+    <ul>
+      <li>Team roles (owner · admin · developer · receptionist · practitioner · viewer) enforced server-side, last-owner protection, session revocation</li>
+      <li>Self-serve signup, password reset, magic-link sign-in, emailed 7-day revocable staff invitations, email verification that genuinely gates publishing, numbers, and API keys</li>
+      <li>API keys, signed and retried webhooks, multiple workspaces per login, observability, API logs, and a full audit trail</li>
+      <li>Website enquiries become tracked <strong>sales leads</strong> with an inbox and pipeline; an operator <strong>growth funnel</strong> (signup → first call → first booking → got paid); a 57-page marketing site with full documentation</li>
+    </ul>
+  </div>
+</section>
+
+<section class="no">
+  <h2>❌ What it cannot do <span class="sub">Deliberately not there — and what exists instead</span></h2>
+  <table>
+    <tr><th style="width:38%">Not there</th><th>What exists instead</th></tr>
+    <tr><td>Live card-payment settlement</td><td>A Stripe adapter that runs the whole payment flow in sandbox mode; real payments are not yet verified</td></tr>
+    <tr><td>Real carrier / AI-model / email delivery</td><td>Verified end-to-end against test doubles; real provider keys have not been exercised</td></tr>
+    <tr><td>Two-way accounting sync (e.g. Xero)</td><td>A Xero-shaped export file</td></tr>
+    <tr><td>Stored call-recording audio</td><td>Recording window and metadata on the call record</td></tr>
+    <tr><td>Multi-server / large multi-tenant deployment</td><td>A single-server database today, with a documented Postgres migration path</td></tr>
+    <tr><td>Off-site backups &amp; built-in HTTPS</td><td>Backups land on the same disk unless pointed elsewhere; HTTPS is terminated in front of the app</td></tr>
+    <tr><td>Telehealth video, stock/inventory, insurance claims, HL7/FHIR</td><td>Out of scope by decision</td></tr>
+    <tr><td>Full-text search of notes; a note-template editor</td><td>Templates with finalise/amend, without the editor</td></tr>
+  </table>
+</section>
+
+<div class="note"><strong>One honest detail:</strong> the demonstration workspace runs a rules engine rather than a live AI model. With provider keys configured, the identical call loop runs against a real model — the tools it can use are the same either way. Current verdict from our production review: <strong>ready for a single-site pilot; not yet for multi-tenant clinical deployment.</strong></div>
+
+</main>
+<footer>Voxera — capability statement · Every “can do” above is exercised by the automated suite (37 gates, 1,464 checks, 0 failed).</footer>
+</body>
+</html>

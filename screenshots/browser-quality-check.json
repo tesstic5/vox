@@ -1,0 +1,414 @@
+{
+  "at": "2026-11-05T19:30:17.002Z",
+  "base": "http://127.0.0.1:3000",
+  "limits": {
+    "requests": 180,
+    "transferBytes": 2097152,
+    "scriptBytes": 921600,
+    "cssBytes": 204800,
+    "loadMs": 4000
+  },
+  "results": [
+    {
+      "route": "/",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1262,
+      "resources": 33,
+      "transferBytes": 674023,
+      "scriptBytes": 194849,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 94
+        }
+      ]
+    },
+    {
+      "route": "/pricing",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1234,
+      "resources": 32,
+      "transferBytes": 667989,
+      "scriptBytes": 188815,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 46
+        }
+      ]
+    },
+    {
+      "route": "/signup",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1268,
+      "resources": 34,
+      "transferBytes": 774737,
+      "scriptBytes": 193814,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 43
+        },
+        {
+          "id": "link-in-text-block",
+          "impact": "serious",
+          "nodes": 3
+        }
+      ]
+    },
+    {
+      "route": "/book/northwind-labs",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1349,
+      "resources": 34,
+      "transferBytes": 678496,
+      "scriptBytes": 195032,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 4
+        }
+      ]
+    },
+    {
+      "route": "/dashboard",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1530,
+      "resources": 44,
+      "transferBytes": 704775,
+      "scriptBytes": 209911,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 22
+        }
+      ]
+    },
+    {
+      "route": "/dashboard/calendar",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1500,
+      "resources": 43,
+      "transferBytes": 959948,
+      "scriptBytes": 211567,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 259
+        }
+      ]
+    },
+    {
+      "route": "/dashboard/my-day",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1362,
+      "resources": 38,
+      "transferBytes": 693657,
+      "scriptBytes": 209792,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "route": "/dashboard/classes",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1285,
+      "resources": 38,
+      "transferBytes": 720039,
+      "scriptBytes": 210952,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "route": "/dashboard/clients",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1508,
+      "resources": 39,
+      "transferBytes": 824027,
+      "scriptBytes": 215641,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "route": "/dashboard/messaging",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1377,
+      "resources": 40,
+      "transferBytes": 848288,
+      "scriptBytes": 216737,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "route": "/dashboard/money",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1434,
+      "resources": 43,
+      "transferBytes": 1344125,
+      "scriptBytes": 211308,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "route": "/dashboard/reports",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1547,
+      "resources": 41,
+      "transferBytes": 883870,
+      "scriptBytes": 217603,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "route": "/dashboard/enquiries",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1309,
+      "resources": 45,
+      "transferBytes": 705273,
+      "scriptBytes": 210960,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "route": "/dashboard/estimates",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1394,
+      "resources": 48,
+      "transferBytes": 709689,
+      "scriptBytes": 210960,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "route": "/dashboard/jobs",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1357,
+      "resources": 46,
+      "transferBytes": 707070,
+      "scriptBytes": 210960,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "route": "/dashboard/dispatch",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1399,
+      "resources": 46,
+      "transferBytes": 707070,
+      "scriptBytes": 210960,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "route": "/dashboard/business",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1334,
+      "resources": 38,
+      "transferBytes": 692856,
+      "scriptBytes": 206266,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 2
+        }
+      ]
+    },
+    {
+      "route": "/dashboard/settings/security",
+      "viewport": "desktop",
+      "pass": true,
+      "issues": [],
+      "wallMs": 1218,
+      "resources": 37,
+      "transferBytes": 689361,
+      "scriptBytes": 208635,
+      "cssBytes": 21511,
+      "failedRequests": [],
+      "badResponses": [],
+      "duplicateApiRequests": [],
+      "violations": [],
+      "incompleteAxeChecks": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": 2
+        }
+      ]
+    }
+  ]
+}

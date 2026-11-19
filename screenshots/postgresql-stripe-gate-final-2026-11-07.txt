@@ -1,0 +1,30 @@
+
+> voxera@1.0.0 check:stripe
+> python3 scripts/stripe-check.py
+
+PASS  demo owner signs in  — 200
+PASS  Stripe stub resets  — {'reset': True}
+PASS  the deployment selects Stripe instead of sandbox  — {'driver': 'stripe', 'reason': 'the deployment has a Stripe key', 'mode': 'test'}
+PASS  a completed visit exists to bill  — {'createdAt': '2026-11-07T17:47:09.004Z', 'id': 'bkg_d2ff32462b3a4780', 'orgId': 'org_3b5dd38bbd095dd5', 'externalId': 'stripe-check-1794073628992', 'customer': {'name': 'Stripe Ch
+PASS  the visit raises a draft invoice  — {'invoice': {'createdAt': '2026-11-07T17:47:09.071Z', 'id': 'inv_dc6a57e412797757', 'orgId': 'org_3b5dd38bbd095dd5', 'kind': 'invoice', 'status': 'draft', 'clientId': 'cli_6ag29a01
+PASS  the invoice is issued before collection  — {'invoice': {'createdAt': '2026-11-07T17:47:09.071Z', 'id': 'inv_dc6a57e412797757', 'orgId': 'org_3b5dd38bbd095dd5', 'kind': 'invoice', 'status': 'issued', 'clientId': 'cli_6ag29a0
+PASS  Stripe checkout rejection is surfaced  — Stripe refused the checkout session: Injected checkout-session failure
+PASS  a rejected checkout leaves no local payment link  — 0
+PASS  a Stripe payment link is created  — {'link': {'createdAt': '2026-11-07T17:47:09.187Z', 'id': 'plink_e87f5e66109915a8', 'orgId': 'org_3b5dd38bbd095dd5', 'token': '3c04045b8d4aca27e00519bc', 'invoiceId': 'inv_dc6a57e41
+PASS  the patient URL is Stripe-hosted  — http://127.0.0.1:4030/checkout/cs_test_stub_000001
+PASS  Stripe receives the exact minor-unit amount and currency  — {'id': 'cs_test_stub_000001', 'object': 'checkout.session', 'url': 'http://127.0.0.1:4030/checkout/cs_test_stub_000001', 'amount_total': 500, 'currency': 'usd', 'payment_status': '
+PASS  Stripe receives invoice, workspace and token metadata  — {'invoiceId': 'inv_dc6a57e412797757', 'orgId': 'org_3b5dd38bbd095dd5', 'token': '3c04045b8d4aca27e00519bc'}
+PASS  success and cancel URLs return to the same payment token  — {'success': 'https://ci.example.test/pay/3c04045b8d4aca27e00519bc?paid=1', 'cancel': 'https://ci.example.test/pay/3c04045b8d4aca27e00519bc?cancelled=1'}
+PASS  the public page is minimal and marks this as provider-backed  — {'token': '3c04045b8d4aca27e00519bc', 'status': 'open', 'amountMinor': 500, 'currency': 'USD', 'amountFormatted': '$5.00', 'description': 'INV-2296 — Stripe Check 28992', 'practice
+PASS  the public sandbox door cannot settle a Stripe link  — This practice takes payments through its provider — finish the payment on the page you were sent.
+PASS  an unsigned Stripe webhook is rejected  — {'error': {'code': 'UNAUTHORIZED', 'message': 'Signature verification failed.'}}
+PASS  a correctly signed but stale webhook is rejected  — {'error': {'code': 'UNAUTHORIZED', 'message': 'Signature verification failed.'}}
+PASS  a signed event does not settle before payment clears  — {'received': True, 'applied': False, 'reason': 'payment not cleared yet (unpaid)'}
+PASS  the provider now reports the session paid  — {'failCreates': 0, 'session': {'id': 'cs_test_stub_000001', 'object': 'checkout.session', 'url': 'http://127.0.0.1:4030/checkout/cs_test_stub_000001', 'amount_total': 500, 'currenc
+PASS  a current signed paid event settles the link  — {'received': True, 'applied': True, 'reason': 'settled', 'paymentId': 'pay_2fd3bb55193a6d24'}
+PASS  the same Stripe event is idempotent  — {'received': True, 'applied': True, 'reason': 'settled', 'paymentId': 'pay_2fd3bb55193a6d24'}
+PASS  the invoice records the Stripe payment exactly once  — {'payments': 1, 'paidMinor': 500}
+PASS  the payment link closes with its payment attached  — {'createdAt': '2026-11-07T17:47:09.187Z', 'id': 'plink_e87f5e66109915a8', 'orgId': 'org_3b5dd38bbd095dd5', 'token': '3c04045b8d4aca27e00519bc', 'invoiceId': 'inv_dc6a57e412797757',
+PASS  the ledger preserves Stripe's provider reference and webhook source  — {'createdAt': '2026-11-07T17:47:09.232Z', 'id': 'pay_2fd3bb55193a6d24', 'orgId': 'org_3b5dd38bbd095dd5', 'clientId': 'cli_6ag29a01qn', 'clientName': 'Stripe Check 28992', 'kind': '
+
+ALL STRIPE CHECKS PASS — stub contract verified; no claim of live settlement.

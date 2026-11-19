@@ -1,0 +1,7 @@
+
+> voxera@1.0.0 check:production-config
+> tsx scripts/production-config-check.ts
+
+production profile: dokploy
+strict validation: enabled
+production configuration is valid

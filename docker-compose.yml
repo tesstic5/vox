@@ -1,0 +1,155 @@
+# Dokploy/VPS production stack: app + PostgreSQL 17 + online backups.
+#
+# 1. Copy deploy/dokploy.env.example to a private .env and fill every REQUIRED
+#    value (Dokploy may inject the same names from its environment/secret UI).
+# 2. Configure the public domain in Dokploy to route to app:3000.
+# 3. `docker compose up -d --build`; then follow deploy/DOKPLOY-RUNBOOK.md.
+#
+# PostgreSQL is intentionally not published on the VPS. `DATABASE_URL` uses the
+# internal service name. Generate POSTGRES_PASSWORD as URL-safe hex so the same
+# value is valid inside that URL.
+
+name: voxera
+
+services:
+  db:
+    image: postgres:17-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-voxera}
+      POSTGRES_USER: ${POSTGRES_USER:-voxera}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set a URL-safe PostgreSQL password}
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    stop_grace_period: 60s
+    shm_size: 256mb
+    mem_limit: ${POSTGRES_MEMORY_LIMIT:-1g}
+    cpus: ${POSTGRES_CPUS:-1.5}
+
+  app:
+    build:
+      context: .
+    image: ${VOXERA_IMAGE:-voxera:latest}
+    restart: unless-stopped
+    init: true
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${VOXERA_BIND_ADDRESS:-127.0.0.1}:${VOXERA_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      VOXERA_PRODUCTION_PROFILE: dokploy
+      VOXERA_STRICT_CONFIG: "1"
+      VOXERA_STORE: postgres
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-voxera}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-voxera}}
+      VOXERA_DATA_DIR: /app/data
+      VOXERA_PUBLIC_URL: ${VOXERA_PUBLIC_URL:?set the public HTTPS origin}
+      VOXERA_OPERATOR_EMAILS: ${VOXERA_OPERATOR_EMAILS:?set at least one operator email}
+      VOXERA_SECRET_KEY: ${VOXERA_SECRET_KEY:?set a 32+ character encryption key}
+      VOXERA_MANAGE_SECRET: ${VOXERA_MANAGE_SECRET:?set a 32+ character client-link key}
+      VOXERA_DEMO_SECRET: ${VOXERA_DEMO_SECRET:?set a 32+ character demo-token key}
+      # Phase 1 clinical/document settings. Approval defaults closed; filesystem
+      # blobs are synthetic/test only and share the encrypted app data volume.
+      VOXERA_CLINICAL_DATA_APPROVED: ${VOXERA_CLINICAL_DATA_APPROVED:-0}
+      VOXERA_DOCUMENT_MASTER_KEY: ${VOXERA_DOCUMENT_MASTER_KEY:-}
+      VOXERA_DOCUMENT_MAX_BYTES: ${VOXERA_DOCUMENT_MAX_BYTES:-26214400}
+      VOXERA_BLOB_BACKEND: ${VOXERA_BLOB_BACKEND:-filesystem}
+      VOXERA_BLOB_ROOT: ${VOXERA_BLOB_ROOT:-/app/data/clinical-blobs}
+      VOXERA_S3_ENDPOINT: ${VOXERA_S3_ENDPOINT:-}
+      VOXERA_S3_REGION: ${VOXERA_S3_REGION:-auto}
+      VOXERA_S3_BUCKET: ${VOXERA_S3_BUCKET:-}
+      VOXERA_S3_ACCESS_KEY_ID: ${VOXERA_S3_ACCESS_KEY_ID:-}
+      VOXERA_S3_SECRET_ACCESS_KEY: ${VOXERA_S3_SECRET_ACCESS_KEY:-}
+      VOXERA_MALWARE_SCAN_COMMAND: ${VOXERA_MALWARE_SCAN_COMMAND:-}
+      VOXERA_MALWARE_SCAN_ARGS_JSON: ${VOXERA_MALWARE_SCAN_ARGS_JSON:-}
+      VOXERA_MALWARE_SCAN_TIMEOUT_MS: ${VOXERA_MALWARE_SCAN_TIMEOUT_MS:-120000}
+      VOXERA_MEDIA_SECRET: ${VOXERA_MEDIA_SECRET:-}
+      VOXERA_REQUIRE_MEDIA: ${VOXERA_REQUIRE_MEDIA:-0}
+      VOXERA_TRUST_PROXY: "1"
+      VOXERA_TRUST_PROXY_HOPS: ${VOXERA_TRUST_PROXY_HOPS:-1}
+      VOXERA_SCHEDULER: ${VOXERA_SCHEDULER:-1}
+      VOXERA_BUILD_ID: ${VOXERA_BUILD_ID:-unknown}
+      # Provider pairs are optional, but each configured pair must be complete.
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      VOXERA_EMAIL_PROVIDER: ${VOXERA_EMAIL_PROVIDER:-}
+      VOXERA_EMAIL_API_BASE: ${VOXERA_EMAIL_API_BASE:-}
+      VOXERA_EMAIL_API_KEY: ${VOXERA_EMAIL_API_KEY:-}
+      VOXERA_EMAIL_FROM: ${VOXERA_EMAIL_FROM:-}
+      RESEND_WEBHOOK_SECRET: ${RESEND_WEBHOOK_SECRET:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      DEEPGRAM_API_KEY: ${DEEPGRAM_API_KEY:-}
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
+      ELEVENLABS_VOICE_ID: ${ELEVENLABS_VOICE_ID:-}
+      CARTESIA_API_KEY: ${CARTESIA_API_KEY:-}
+      CARTESIA_VOICE_ID: ${CARTESIA_VOICE_ID:-}
+      CARTESIA_MODEL: ${CARTESIA_MODEL:-}
+      OPENAI_TTS_MODEL: ${OPENAI_TTS_MODEL:-}
+      OPENAI_TTS_VOICE: ${OPENAI_TTS_VOICE:-}
+      VOXERA_REQUIRE_AI: ${VOXERA_REQUIRE_AI:-0}
+    volumes:
+      - voxera-ops:/app/data
+    stop_grace_period: 30s
+    mem_limit: ${VOXERA_MEMORY_LIMIT:-1536m}
+    cpus: ${VOXERA_CPUS:-2.0}
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/api/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 4
+
+  backup:
+    image: ${VOXERA_IMAGE:-voxera:latest}
+    restart: unless-stopped
+    init: true
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      VOXERA_STORE: postgres
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-voxera}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-voxera}}
+      VOXERA_DATA_DIR: /app/data
+      VOXERA_BACKUP_STATUS: /app/data/backups/status.json
+      VOXERA_HEALTH_URL: http://app:3000/api/health
+      BACKUP_INTERVAL_SECONDS: ${BACKUP_INTERVAL_SECONDS:-21600}
+      BACKUP_KEEP: ${BACKUP_KEEP:-56}
+    volumes:
+      - voxera-ops:/app/data
+      # This path must be copied off-VPS by the operator or object-storage agent.
+      - ${BACKUP_DIR:-./backups}:/backups
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        set -eu
+        while true; do
+          npm run store:backup -- /backups --keep "$${BACKUP_KEEP}" || echo "backup failed at $$(date -Iseconds)" >&2
+          sleep "$${BACKUP_INTERVAL_SECONDS}"
+        done
+    stop_grace_period: 20s
+    mem_limit: ${BACKUP_MEMORY_LIMIT:-768m}
+    cpus: ${BACKUP_CPUS:-1.0}
+
+volumes:
+  postgres-data:
+  voxera-ops:

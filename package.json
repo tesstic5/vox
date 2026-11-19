@@ -1,0 +1,83 @@
+{
+  "name": "voxera",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0 -p 3000",
+    "build": "next build",
+    "start": "tsx server.ts",
+    "lint": "tsc --noEmit",
+    "start:next": "next start -H 0.0.0.0 -p 3000",
+    "media:check": "tsx scripts/media-check.ts",
+    "check": "python3 scripts/check.py",
+    "check:offline": "python3 scripts/check.py --offline",
+    "check:list": "python3 scripts/check.py --list",
+    "check:browser": "node scripts/check-browser.mjs",
+    "check:performance": "node scripts/runtime-performance-check.mjs",
+    "check:load": "node scripts/sustained-load-check.mjs",
+    "check:postgres": "VOXERA_ALLOW_DESTRUCTIVE_MAINTENANCE=1 tsx scripts/postgres-check.ts",
+    "check:phase1": "bash scripts/phase1-check.sh",
+    "check:phase1:api": "python3 scripts/phase1-api-security-check.py",
+    "check:phase1:postgres": "VOXERA_ALLOW_DESTRUCTIVE_MAINTENANCE=1 tsx scripts/phase1-postgres-clinical-check.ts",
+    "check:phase3": "tsx scripts/phase3-workflow-check.ts",
+    "check:phase3:api": "python3 scripts/phase3-api-check.py",
+    "check:phase3:race": "python3 scripts/phase3-race-check.py",
+    "check:tasks-automations": "tsx scripts/tasks-automations-check.ts",
+    "check:tasks-automations:api": "python3 scripts/tasks-automations-api-check.py",
+    "check:tasks-automations:race": "python3 scripts/tasks-automations-race-check.py",
+    "check:tasks-automations:sqlite": "bash scripts/tasks-automations-sqlite-check.sh",
+    "check:tasks-automations:postgres": "bash scripts/tasks-automations-postgres-check.sh",
+    "check:tasks-automations:ui": "node scripts/tasks-automations-ui-pass.mjs",
+    "check:intake-admin": "tsx scripts/intake-admin-check.ts",
+    "check:intake-admin:api": "python3 scripts/intake-admin-api-check.py",
+    "check:intake-admin:ui": "node scripts/intake-admin-ui-pass.mjs",
+    "check:intake-admin:race": "tsx scripts/intake-admin-race-check.ts",
+    "check:stripe": "python3 scripts/stripe-check.py",
+    "check:email-provider": "tsx scripts/email-provider-check.ts",
+    "check:resend-webhook": "node scripts/resend-webhook-check.mjs",
+    "check:production-config": "tsx scripts/production-config-check.ts",
+    "check:claims": "python3 scripts/marketing-claims-check.py",
+    "check:staging": "node scripts/public-staging-check.mjs",
+    "check:migration": "tsx scripts/run-migration-check.ts",
+    "migrate:postgres": "tsx scripts/migrate-to-postgres.ts",
+    "store:peek": "tsx scripts/store-peek.ts",
+    "store:backup": "tsx scripts/backup-store.ts",
+    "store:restore": "tsx scripts/restore-store.ts"
+  },
+  "dependencies": {
+    "@types/ws": "^8.18.1",
+    "better-sqlite3": "^12.11.1",
+    "clsx": "^2.1.1",
+    "next": "^16.4.3",
+    "pg-native": "3.9.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tailwind-merge": "^3.7.0",
+    "tsx": "^4.23.15",
+    "ws": "^8.21.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^4.3.3",
+    "typescript": "5.9.3"
+  },
+  "overrides": {
+    "source-map-js": "1.2.2",
+    "next": {
+      "postcss": "8.5.31"
+    }
+  },
+  "description": "Multi-business booking, communication and field-service workspace with optional provider-backed assistants, built with Next.js 16 and React 19.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,63 @@
+===== admin_check =====
+
+Voxera check — live suite, 1 gate(s) against http://127.0.0.1:3000
+  ✔ tsc --noEmit             4.0s
+
+  ✔ admin_check              15 passed              1.1s
+
+  logs: /tmp/gates/<gate>.txt
+  1 gate(s) green — 15 checks passed, 0 failed.
+
+  Offline gates are separate — with the app stopped: npm run check:offline
+===== security_check =====
+
+Voxera check — live suite, 1 gate(s) against http://127.0.0.1:3000
+  ✔ tsc --noEmit             3.8s
+
+  ✔ security_check           19 passed              0.8s
+
+  logs: /tmp/gates/<gate>.txt
+  1 gate(s) green — 19 checks passed, 0 failed.
+
+  Offline gates are separate — with the app stopped: npm run check:offline
+===== onboard_check =====
+
+Voxera check — live suite, 1 gate(s) against http://127.0.0.1:3000
+  ✔ tsc --noEmit             3.7s
+
+  ✔ onboard_check            56 passed              0.9s
+
+  logs: /tmp/gates/<gate>.txt
+  1 gate(s) green — 56 checks passed, 0 failed.
+
+  Offline gates are separate — with the app stopped: npm run check:offline
+===== manage_check =====
+
+Voxera check — live suite, 1 gate(s) against http://127.0.0.1:3000
+  ✔ tsc --noEmit             3.7s
+
+  ✔ manage_check             38 passed              1.6s
+
+  logs: /tmp/gates/<gate>.txt
+  1 gate(s) green — 38 checks passed, 0 failed.
+
+  Offline gates are separate — with the app stopped: npm run check:offline
+===== messaging_check =====
+
+Voxera check — live suite, 1 gate(s) against http://127.0.0.1:3000
+  ✔ tsc --noEmit             3.6s
+
+  ✘ messaging_check          3 failed
+      3 FAILED: a person at the desk can still text while the automation is off; and the row says who sent it; and it is filed as a person's message, not as
+      PASS  its dry run says it would text, not dial  — {"ok": true, "dryRun": true, "via": "workspace", "dialled": 0, "skipped": 3, "calls": [{"bookingId":
+      PASS  a real run queues the texts  — texted 3 · dialled 0 · 3 text(s) queued.
+      PASS  and dials nobody  — dialled 0
+      PASS  the campaign carries both channels in its settings  — {"call": false, "sms": true}
+      PASS  and counts what it texted as well as what it dialled  — {"runs": 1, "dialled": 0, "confirmed": 0, "rescheduled": 0, "cancelled": 0, "noAnswer": 
+      3 FAILED: a person at the desk can still text while the automation is off; and the row says who sent it; and it is filed as a person's message, not as
+
+  Stopped at the first failure. Re-run with --keep-going for the whole picture.
+
+  logs: /tmp/gates/<gate>.txt
+  1 of 1 gate(s) FAILED: messaging_check
+    · messaging_check: 3 FAILED: a person at the desk can still text while the automation is off; and the row says who sent it; and it is filed as a person's message, not as

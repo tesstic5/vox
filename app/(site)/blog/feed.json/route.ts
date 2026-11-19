@@ -1,0 +1,1 @@
+import { NextResponse } from 'next/server'; export function GET(){return NextResponse.json({version:'https://jsonfeed.org/version/1.1',title:'Voxera implementation updates',home_page_url:'/docs',items:[]});}

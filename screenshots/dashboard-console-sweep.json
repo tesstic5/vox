@@ -1,0 +1,307 @@
+{
+ "at": "2026-11-09T10:56:50.271Z",
+ "base": "http://127.0.0.1:3000",
+ "checks": [
+  {
+   "route": "/dashboard",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/analytics",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/assistants",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/assistants/asst_e49a910501",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/assistants/new",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/audit",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/batch",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/billing",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/board",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/bookings",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/business",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/calendar",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/calls",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/calls/call_d88b5b1aa3fb",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/campaigns",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/carriers",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/classes",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/clients",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/clinical",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/clinical/operations",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/dispatch",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/documents",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/enquiries",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/estimates",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/evals",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/files",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/growth",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/jobs",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/keys",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/knowledge",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/leads",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/logs",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/mcp",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/messaging",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/money",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/my-day",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/notifications",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/numbers",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/numbers/num_b0212d5c",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/observability",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/observability/wallboard",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/onboarding",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/orgs",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/playground",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/practice",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/providers",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/reports",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/settings",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/settings/privacy",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/settings/roles",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/settings/security",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/setup",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/simulations",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/squads",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/team",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/tools",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/webhooks",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/widget",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/workflows",
+   "pass": true,
+   "errors": []
+  },
+  {
+   "route": "/dashboard/workflows/unavailable",
+   "pass": true,
+   "errors": []
+  }
+ ],
+ "skipped": 1
+}

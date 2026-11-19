@@ -1,0 +1,157 @@
+{
+  "at": "2026-11-06T17:44:43.658Z",
+  "base": "http://127.0.0.1:3000",
+  "loopback": true,
+  "iterations": 12,
+  "loginMs": 526.7,
+  "endpoints": [
+    {
+      "name": "health",
+      "path": "/api/health",
+      "samples": 12,
+      "status": [
+        200
+      ],
+      "p50Ms": 16.6,
+      "p95Ms": 27.3,
+      "maxMs": 27.3,
+      "averageBytes": 182,
+      "budgetP95Ms": 100
+    },
+    {
+      "name": "session",
+      "path": "/api/auth/me",
+      "samples": 12,
+      "status": [
+        200
+      ],
+      "p50Ms": 3.6,
+      "p95Ms": 6,
+      "maxMs": 6,
+      "averageBytes": 876,
+      "budgetP95Ms": 150
+    },
+    {
+      "name": "workspace profile",
+      "path": "/api/v1/workspace/profile",
+      "samples": 12,
+      "status": [
+        200
+      ],
+      "p50Ms": 2.9,
+      "p95Ms": 4.6,
+      "maxMs": 4.6,
+      "averageBytes": 4143,
+      "budgetP95Ms": 200
+    },
+    {
+      "name": "three-day diary",
+      "path": "/api/v1/day?days=3",
+      "samples": 12,
+      "status": [
+        200
+      ],
+      "p50Ms": 3,
+      "p95Ms": 3.5,
+      "maxMs": 3.5,
+      "averageBytes": 1418,
+      "budgetP95Ms": 300
+    },
+    {
+      "name": "clients",
+      "path": "/api/v1/clients?limit=50",
+      "samples": 12,
+      "status": [
+        200
+      ],
+      "p50Ms": 9.6,
+      "p95Ms": 24.8,
+      "maxMs": 24.8,
+      "averageBytes": 31247,
+      "budgetP95Ms": 300
+    },
+    {
+      "name": "reports",
+      "path": "/api/v1/reports",
+      "samples": 12,
+      "status": [
+        200
+      ],
+      "p50Ms": 61.7,
+      "p95Ms": 101.8,
+      "maxMs": 101.8,
+      "averageBytes": 171160,
+      "budgetP95Ms": 500
+    },
+    {
+      "name": "invoice list",
+      "path": "/api/v1/invoices?include=all",
+      "samples": 12,
+      "status": [
+        200
+      ],
+      "p50Ms": 7,
+      "p95Ms": 16,
+      "maxMs": 16,
+      "averageBytes": 359429,
+      "budgetP95Ms": 400
+    },
+    {
+      "name": "field jobs",
+      "path": "/api/v1/jobs",
+      "samples": 12,
+      "status": [
+        200
+      ],
+      "p50Ms": 2.8,
+      "p95Ms": 7.7,
+      "maxMs": 7.7,
+      "averageBytes": 254,
+      "budgetP95Ms": 300
+    },
+    {
+      "name": "scheduler state",
+      "path": "/api/v1/scheduler",
+      "samples": 12,
+      "status": [
+        200
+      ],
+      "p50Ms": 2.9,
+      "p95Ms": 3.9,
+      "maxMs": 3.9,
+      "averageBytes": 4129,
+      "budgetP95Ms": 300
+    }
+  ],
+  "burst": {
+    "requests": 32,
+    "ok": 32,
+    "p50Ms": 214.8,
+    "p95Ms": 405.3,
+    "maxMs": 418.1,
+    "budgetP95Ms": 500
+  },
+  "scheduler": {
+    "running": true,
+    "jobs": 8,
+    "firstRetention": {
+      "name": "retention",
+      "orgId": "org_3b5dd38bbd095dd5",
+      "ok": true,
+      "detail": "nothing to sweep",
+      "ms": 54
+    },
+    "secondRetention": {
+      "name": "retention",
+      "orgId": "org_3b5dd38bbd095dd5",
+      "ok": true,
+      "detail": "nothing to sweep",
+      "ms": 26
+    },
+    "runsBefore": 27,
+    "runsAfter": 29,
+    "failuresBefore": 0,
+    "failuresAfter": 0
+  },
+  "issues": []
+}

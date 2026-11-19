@@ -1,0 +1,24 @@
+(node:9200) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("/home/user/voxera/scripts/isolated-browser-loader.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS  /                              1230 ms · 33 req · 694 KiB · 0 axe
+PASS  /pricing                       1251 ms · 32 req · 688 KiB · 0 axe
+PASS  /signup                        1261 ms · 34 req · 793 KiB · 0 axe
+PASS  /book/northwind-labs           1315 ms · 34 req · 699 KiB · 0 axe
+PASS  /dashboard                     1382 ms · 44 req · 724 KiB · 0 axe
+PASS  /dashboard/calendar            1273 ms · 42 req · 735 KiB · 0 axe
+PASS  /dashboard/my-day              1260 ms · 38 req · 713 KiB · 0 axe
+PASS  /dashboard/classes             1279 ms · 39 req · 743 KiB · 0 axe
+PASS  /dashboard/clients             1324 ms · 39 req · 808 KiB · 0 axe
+PASS  /dashboard/messaging           1341 ms · 40 req · 854 KiB · 0 axe
+PASS  /dashboard/money               1261 ms · 43 req · 1255 KiB · 0 axe
+PASS  /dashboard/reports             1333 ms · 41 req · 889 KiB · 0 axe
+PASS  /dashboard/enquiries           1266 ms · 46 req · 727 KiB · 0 axe
+PASS  /dashboard/estimates           1251 ms · 47 req · 727 KiB · 0 axe
+PASS  /dashboard/jobs                1290 ms · 45 req · 725 KiB · 0 axe
+PASS  /dashboard/dispatch            1232 ms · 45 req · 725 KiB · 0 axe
+PASS  /dashboard/business            1289 ms · 38 req · 713 KiB · 0 axe
+PASS  /dashboard/settings/security   1225 ms · 38 req · 711 KiB · 0 axe
+
+18/18 browser quality routes passed · screenshots/browser-quality-check.desktop.json
+BROWSER QUALITY — WCAG A/AA, requests, local latency and resource weight are within guardrails.

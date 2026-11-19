@@ -1,0 +1,58 @@
+/** Search entries for routes that are implemented and intentionally exposed. */
+export type SearchKind = 'doc' | 'blog' | 'page';
+export interface SearchEntry { kind: SearchKind; section: string; title: string; desc: string; href: string; text: string }
+
+const ENTRIES: Array<[string, string, string, string]> = [
+  ['/', 'Home', 'Calls, bookings and customer care', 'Public'],
+  ['/platform', 'Platform capabilities', 'Implemented records and provider boundaries', 'Public'],
+  ['/solutions', 'Business workflows', 'Contractor, dental, physiotherapy and other profiles', 'Public'],
+  ['/docs', 'Implementation guide', 'Verified workflows and release boundaries', 'Public'],
+  ['/security', 'Security boundaries', 'Application controls and external review work', 'Public'],
+  ['/pricing', 'Pricing boundary', 'Deployment and provider cost responsibilities', 'Public'],
+  ['/status', 'Deployment status', 'Current health without invented uptime history', 'Public'],
+  ['/support', 'Support paths', 'Request IDs, audit records and self-service evidence', 'Public'],
+  ['/contact', 'Contact', 'Create a deployment enquiry record', 'Public'],
+  ['/privacy', 'Privacy boundary', 'Application data and operator responsibilities', 'Public'],
+  ['/terms-of-service', 'Use terms', 'Safe-use and operator contract boundaries', 'Public'],
+  ['/login', 'Sign in', 'Open an existing workspace', 'Account'],
+  ['/signup', 'Create workspace', 'Choose a business type and create an owner', 'Account'],
+  ['/reset-password', 'Reset password', 'Request a single-use reset link', 'Account'],
+  ['/magic-link', 'Magic link', 'Request passwordless sign-in by email', 'Account'],
+  ['/dashboard', 'Overview', 'Stored call analytics and setup records', 'Dashboard'],
+  ['/dashboard/setup', 'Setup checklist', 'Server-derived business, operations, assistant, number and call steps', 'Dashboard'],
+  ['/dashboard/business', 'Business profile and modules', 'Explicit type, vocabulary and owner-selected modules', 'Dashboard'],
+  ['/dashboard/enquiries', 'Enquiries', 'Contractor service enquiries', 'Field service'],
+  ['/dashboard/estimates', 'Estimates', 'Versioned estimates and customer acceptance', 'Field service'],
+  ['/dashboard/jobs', 'Jobs', 'Accepted work, completion and invoices', 'Field service'],
+  ['/dashboard/dispatch', 'Dispatch', 'Conflict-checked visits and technician diary', 'Field service'],
+  ['/dashboard/my-day', 'My day', 'Assigned appointments and status actions', 'Scheduling'],
+  ['/dashboard/calendar', 'Calendar', 'Appointments, availability and wait list', 'Scheduling'],
+  ['/dashboard/classes', 'Classes', 'Sessions, rosters, queues and packs', 'Scheduling'],
+  ['/dashboard/clients', 'Customers or patients', 'Tenant-scoped contact, access, notes and attachments', 'Records'],
+  ['/dashboard/bookings', 'Booking campaigns', 'Synced appointments and confirmation runs', 'Scheduling'],
+  ['/dashboard/messaging', 'Messages', 'Templates, queue, reminders and replies', 'Communications'],
+  ['/dashboard/money', 'Invoices and payments', 'Recorded invoices, balances and payment links', 'Money'],
+  ['/dashboard/reports', 'Reports', 'Server-derived business and practice reports', 'Reports'],
+  ['/dashboard/practice', 'Services and availability', 'Locations, providers, rotas and booking rules', 'Scheduling'],
+  ['/dashboard/board', 'Staff board', 'Workspace board entries', 'Workspace'],
+  ['/dashboard/team', 'Team and roles', 'Members, invites and server-enforced roles', 'Workspace'],
+  ['/dashboard/assistants', 'Assistants', 'Draft, test, publish, versions and rollback', 'Calls'],
+  ['/dashboard/calls', 'Call records', 'Stored transcripts, metrics, costs and recording URLs', 'Calls'],
+  ['/dashboard/numbers', 'Phone numbers', 'Carrier-backed lines and explicit sandbox records', 'Calls'],
+  ['/dashboard/notifications', 'Workspace notices', 'Persisted notice records; no automatic alerting claim', 'Workspace'],
+  ['/dashboard/audit', 'Audit log', 'Tenant-owned security and configuration records', 'Workspace'],
+  ['/dashboard/settings', 'Settings', 'Workspace export and server-backed settings', 'Workspace'],
+  ['/dashboard/settings/security', 'Account security', 'Authenticator two-factor and recovery codes', 'Workspace'],
+  ['/dashboard/tools', 'Registered tools', 'Persisted runtime tool registry and assistant attachment', 'Developer'],
+  ['/dashboard/providers', 'Model providers', 'Credential verification and runtime status', 'Developer'],
+  ['/dashboard/carriers', 'Carriers', 'Verify credentials, search, buy and adopt real numbers', 'Developer'],
+  ['/dashboard/webhooks', 'Webhooks', 'Signed endpoint delivery and attempts', 'Developer'],
+  ['/dashboard/analytics', 'Call analytics', 'Server-derived volume, outcomes, latency and stored cost', 'Developer'],
+  ['/dashboard/observability', 'Observability', 'Stored call metrics without inferred provider uptime', 'Developer'],
+  ['/dashboard/playground', 'API console', 'Send actual same-origin tenant-scoped requests', 'Developer'],
+  ['/dashboard/keys', 'API keys', 'Generate, scope and revoke hashed keys', 'Developer'],
+];
+
+export function buildSearchIndex(): SearchEntry[] {
+  return ENTRIES.map(([href, title, desc, section]) => ({ kind: section === 'Public' && href === '/docs' ? 'doc' : 'page', section, title, desc, href, text: `${title} ${desc} ${section} ${href}`.toLowerCase() }));
+}

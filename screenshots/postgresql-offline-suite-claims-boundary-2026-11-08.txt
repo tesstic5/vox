@@ -1,0 +1,12 @@
+
+> voxera@1.0.0 check:offline
+> python3 scripts/check.py --offline
+
+
+Voxera check — offline suite, 2 gate(s) against http://127.0.0.1:3000
+
+  ✔ offer_expiry_probe --apply 8 passed               2.2s
+  ✔ store-replace-check      10 passed              0.8s
+
+  logs: /tmp/gates/<gate>.txt
+  2 gate(s) green — 18 checks passed, 0 failed.

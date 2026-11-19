@@ -1,0 +1,24 @@
+
+> voxera@1.0.0 check:postgres
+> tsx scripts/postgres-check.ts
+
+PASS PostgreSQL target starts empty
+PASS insert order is newest first
+PASS primary-key get works
+PASS update persists without moving row age
+PASS delete persists
+PASS updated value persists
+PASS tenant page is scoped
+PASS JSONB equality query works
+PASS transactional replace keeps exact state
+PASS global carrier-number uniqueness is database enforced
+PASS pending number-claim uniqueness is database enforced
+PASS child process committed a row
+PASS cross-process version invalidates the warmed cache
+PASS first process owns PostgreSQL scheduler lease
+PASS second process cannot own scheduler lease concurrently
+PASS standby can take scheduler lease after release
+PASS all concurrent rate-limit workers completed
+PASS PostgreSQL rate-limit increment is atomic across processes
+
+PostgreSQL integration: 18/18 checks passed

@@ -1,0 +1,1 @@
+import { OG_CONTENT_TYPE, OG_SIZE, renderOg } from '@/lib/og'; export const alt='No verified openings are published.'; export const size=OG_SIZE; export const contentType=OG_CONTENT_TYPE; export default function Image(){return renderOg({eyebrow:'Careers',title:'Publish only real openings.',subtitle:'No sample role is represented as an active job.',meta:'Operator-owned'});}

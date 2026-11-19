@@ -1,0 +1,1 @@
+import { OG_CONTENT_TYPE, OG_SIZE, renderOg } from '@/lib/og'; export const alt='No fictional author profile.'; export const size=OG_SIZE; export const contentType=OG_CONTENT_TYPE; export default function Image(){return renderOg({eyebrow:'Guide',title:'No author claim.',subtitle:'Use current implementation documentation.',meta:'Evidence only'});}

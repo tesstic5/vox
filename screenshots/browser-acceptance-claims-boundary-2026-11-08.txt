@@ -1,0 +1,203 @@
+(node:7206) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("/home/user/voxera/scripts/isolated-browser-loader.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> voxera@1.0.0 check:browser
+> node scripts/check-browser.mjs
+
+(node:7220) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("/home/user/voxera/scripts/isolated-browser-loader.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+browser walks against http://127.0.0.1:3000
+
+── console — every dashboard page renders without an error
+(node:7232) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("/home/user/voxera/scripts/isolated-browser-loader.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS  /dashboard
+PASS  /dashboard/analytics
+PASS  /dashboard/assistants
+PASS  /dashboard/assistants/asst_e49a910501
+PASS  /dashboard/assistants/new
+PASS  /dashboard/audit
+PASS  /dashboard/batch
+PASS  /dashboard/billing
+PASS  /dashboard/board
+PASS  /dashboard/bookings
+PASS  /dashboard/business
+PASS  /dashboard/calendar
+PASS  /dashboard/calls
+PASS  /dashboard/calls/call_d88b5b1aa3fb
+PASS  /dashboard/campaigns
+PASS  /dashboard/carriers
+PASS  /dashboard/classes
+PASS  /dashboard/clients
+PASS  /dashboard/dispatch
+PASS  /dashboard/enquiries
+PASS  /dashboard/estimates
+PASS  /dashboard/evals
+PASS  /dashboard/files
+PASS  /dashboard/growth
+PASS  /dashboard/jobs
+PASS  /dashboard/keys
+PASS  /dashboard/knowledge
+PASS  /dashboard/leads
+PASS  /dashboard/logs
+PASS  /dashboard/mcp
+PASS  /dashboard/messaging
+PASS  /dashboard/money
+PASS  /dashboard/my-day
+PASS  /dashboard/notifications
+PASS  /dashboard/numbers
+PASS  /dashboard/numbers/num_b0212d5c
+PASS  /dashboard/observability
+PASS  /dashboard/observability/wallboard
+PASS  /dashboard/onboarding
+PASS  /dashboard/orgs
+PASS  /dashboard/playground
+PASS  /dashboard/practice
+PASS  /dashboard/providers
+PASS  /dashboard/reports
+PASS  /dashboard/settings
+PASS  /dashboard/settings/security
+PASS  /dashboard/setup
+PASS  /dashboard/simulations
+PASS  /dashboard/squads
+PASS  /dashboard/team
+PASS  /dashboard/tools
+PASS  /dashboard/webhooks
+PASS  /dashboard/widget
+PASS  /dashboard/workflows
+PASS  /dashboard/workflows/unavailable
+
+55/55 dashboard routes console-clean · screenshots/dashboard-console-sweep.json
+CONSOLE SWEEP — every dashboard page renders without an error.
+
+── day — the practitioner's day, on a phone and a desk
+(node:8598) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("/home/user/voxera/scripts/isolated-browser-loader.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS  signed in  — jordan@northwind.dev (voxera_session)
+PASS  the pass starts from an unlinked login  — true
+PASS  the cookie notice is answered like a person would  — Accept all
+PASS  an unlinked login is told so, in the page, not in an empty day
+PASS  every practitioner record is offered as a claim  — 3 candidates
+PASS  “This is me” turns the login into a diary
+PASS  the page is titled for what it is  — My day
+PASS  and names whose day it is  — Priya Raman
+PASS  free time is shown against bookable time
+PASS  a day off says so instead of showing an empty diary  — not on the rota
+PASS  the next few days hold a diary to read  — 1 visit(s) on 2026-11-09
+PASS  appointments are on the page
+PASS  a visit with no room is flagged rather than hidden
+PASS  the gap line quotes the whole stretch the API reported  — free · 90 min (free 90 min, 90 min bookable)
+PASS  and its sub-line quotes the bookable part, not the whole stretch  — 90 min
+PASS  no horizontal overflow on a 390 px viewport  — 0px
+PASS  “Next 3 days” widens the view  — 3 day(s) in the window
+PASS  an owner can read a colleague’s day, and it says so
+PASS  the day reads on a desk screen too
+PASS  /dashboard loads without a console error  — Overview
+PASS  /dashboard/notifications loads without a console error  — Workspace notices
+PASS  /dashboard/clients loads without a console error  — Customers
+PASS  /dashboard/money loads without a console error  — Money
+PASS  /dashboard/board loads without a console error  — Staff board
+PASS  /dashboard/team loads without a console error  — Team & roles
+PASS  /dashboard/calls loads without a console error  — Calls
+PASS  /dashboard/assistants loads without a console error  — Assistants
+PASS  /dashboard/numbers loads without a console error  — Phone numbers
+PASS  /dashboard/analytics loads without a console error  — Analytics
+PASS  /dashboard/billing loads without a console error  — Billing & usage
+PASS  /dashboard/my-day loads without a console error  — My day
+PASS  /dashboard/logs loads without a console error  — Request logs
+PASS  /dashboard/settings loads without a console error  — Settings
+PASS  the notification delivery boundary is reachable
+PASS  the inbox does not present unwired delivery preferences
+PASS  the implementation guide renders in a browser  — Follow the records that exist.
+PASS  and carries the provider-verification boundary
+PASS  no hydration mismatch anywhere in the chrome
+PASS  no 404s from the dashboard’s own requests
+PASS  nothing else upset the page
+PASS  the login is unlinked again, as the workspace was handed over  — day.linked=false
+
+41/41 checks passed · screenshots/a6-my-day-*.png
+BROWSER PASS — the day view works as a page, on a phone and on a desk.
+
+── calendar — the diary drags what it drew
+(node:8736) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("/home/user/voxera/scripts/isolated-browser-loader.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS  a probe appointment exists at 2pm in the site's own time  — bkg_f7989994ca291ff1 · 2026-11-08T19:00:00.000Z
+PASS  the default view is on a practice clock, not UTC  — timezone=America/New_York · gridSiteId=loc_723a4ce63902ca46
+PASS  and it is the site's own clock  — America/New_York vs America/New_York
+PASS  a 2pm appointment is drawn on the 2pm line  — drawn at 648px, 2pm is 648px
+PASS  dragging an hour down puts it an hour later in the site's clock  — 2026-11-08T20:00:00.000Z (expected 2026-11-08T20:00:00.000Z; UTC-bug would be 2026-11-08T19:00:00.000Z)
+PASS  which is the site-resolved UTC instant, not the raw 15:00Z wall clock  — 2026-11-08T20:00:00.000Z
+PASS  pulling the bottom edge makes the appointment longer, to the 5 minutes  — 30 → 50 minutes
+PASS  dropping on tomorrow's column moves the day, at the same clock time  — 2026-11-09T20:00:00.000Z (expected 2026-11-09T20:00:00.000Z)
+PASS  the page never complained while it was being dragged
+PASS  the probe appointment is cancelled and retained  — status 200
+PASS  and its probe service  — status 200
+PASS  and its probe room  — status 200
+PASS  and its isolated probe site  — status 200
+PASS  and the probe client is archived, not left in the list  — status 200
+
+14/14 checks passed · screenshots/d1-calendar-drag.png
+D1 WALKED — the diary draws one clock and drags the same one.
+
+── classes — classes, from the desk and from the public page
+(node:8824) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("/home/user/voxera/scripts/isolated-browser-loader.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+      (staging a class of its own for this pass)
+PASS  the desk sees the class on its own page  — Probe Class UI 277117
+PASS  with its places counted  — 2/8
+PASS  and a roster to open
+PASS  the roster opens with a way to add somebody
+PASS  and says how many places are left
+PASS  the roster counts who is here — nobody, before anyone arrives  — 0 of 2 here
+PASS  one tap says the room has arrived  — 2 of 2 here
+PASS  and a place can be marked done, on the spot  — 2 of 2 here · 1 done
+PASS  the day the class is on can be reached on the grid  — 2026-11-11
+PASS  the diary draws the class once  — 1 block(s)
+PASS  the block says it is a class, with its count  — 11amclass2/8Probe Class UI 277117Marcus Ito · Northwind East
+PASS  the public page offers classes, not just times
+PASS  the fixture class is offered with its time  — Probe Class UI 277117 11:00am
+PASS  with the places left said out loud  — 6 places left
+PASS  a stranger can take a place from the page
+PASS  and the receipt names the class and the time  — Place bookedProbe Class UI 277117 · Wednesday 11 November at 11:00amMarcus Ito · Northwind
+PASS  a full class is offered as a queue, not hidden  — Probe Class UI 277117Full — join the wait listSaturday 14 November at 3:00pm–4:0
+PASS  and a stranger can join the line from it
+PASS  the page says where they are in line, and for which class  — You are in lineProbe Class UI 277117 · Saturday 14 November at 3:00pmYou are first in line for a pla
+PASS  the desk sees who is in line  — Skip to content Voxera. WORKSPACE New appointment EVERYDAY WORK Overview My day Calendar Classes Cli
+PASS  a place given back is offered to the person in line
+PASS  the desk pages never complained
+PASS  nor did the public page
+      (the staged class has been cancelled and swept away)
+
+23 checks passed · screenshots/classes-desk.png · screenshots/classes-public.png
+CLASSES WALKED — the desk and the public page both show what the API holds.
+
+── field — contractor workflow on desktop and mobile
+(node:8934) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("/home/user/voxera/scripts/isolated-browser-loader.mjs", pathToFileURL("./"));'
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS  desktop /dashboard/enquiries
+PASS  desktop /dashboard/estimates
+PASS  desktop /dashboard/jobs
+PASS  desktop /dashboard/dispatch
+PASS  mobile  /dashboard/enquiries
+PASS  mobile  /dashboard/estimates
+PASS  mobile  /dashboard/jobs
+PASS  mobile  /dashboard/dispatch
+
+8/8 contractor viewport checks passed · screenshots/field-ui-check.json
+FIELD UI — desktop, mobile, accessibility, keyboard and hydration checks are clean.
+
+── summary
+   ✔ 55 passed                  console — every dashboard page renders without an error
+   ✔ 41 passed                  day — the practitioner's day, on a phone and a desk
+   ✔ 14 passed                  calendar — the diary drags what it drew
+   ✔ 23 passed                  classes — classes, from the desk and from the public page
+   ✔ 8 passed                   field — contractor workflow on desktop and mobile
+
+all 5 walk(s) green — 141 check(s) passed, 0 failed.

@@ -1,0 +1,1 @@
+import { OG_CONTENT_TYPE, OG_SIZE, renderOg } from '@/lib/og'; export const alt='No unverified release claim.'; export const size=OG_SIZE; export const contentType=OG_CONTENT_TYPE; export default function Image(){return renderOg({eyebrow:'Releases',title:'Verify the deployed revision.',subtitle:'Sample release entries are not presented as shipped.',meta:'Evidence required'});}

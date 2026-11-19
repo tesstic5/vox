@@ -1,0 +1,76 @@
+{
+ "at": "2026-11-09T10:57:44.891Z",
+ "checks": [
+  {
+   "label": "a probe appointment exists at 2pm in the site's own time",
+   "pass": true,
+   "detail": "bkg_e4089962de4269cb · 2026-11-09T19:00:00.000Z"
+  },
+  {
+   "label": "the default view is on a practice clock, not UTC",
+   "pass": true,
+   "detail": "timezone=America/New_York · gridSiteId=loc_723a4ce63902ca46"
+  },
+  {
+   "label": "and it is the site's own clock",
+   "pass": true,
+   "detail": "America/New_York vs America/New_York"
+  },
+  {
+   "label": "a 2pm appointment is drawn on the 2pm line",
+   "pass": true,
+   "detail": "drawn at 648px, 2pm is 648px"
+  },
+  {
+   "label": "dragging an hour down puts it an hour later in the site's clock",
+   "pass": true,
+   "detail": "2026-11-09T20:00:00.000Z (expected 2026-11-09T20:00:00.000Z; UTC-bug would be 2026-11-09T19:00:00.000Z)"
+  },
+  {
+   "label": "which is the site-resolved UTC instant, not the raw 15:00Z wall clock",
+   "pass": true,
+   "detail": "2026-11-09T20:00:00.000Z"
+  },
+  {
+   "label": "pulling the bottom edge makes the appointment longer, to the 5 minutes",
+   "pass": true,
+   "detail": "30 → 50 minutes"
+  },
+  {
+   "label": "dropping on tomorrow's column moves the day, at the same clock time",
+   "pass": true,
+   "detail": "2026-11-10T20:00:00.000Z (expected 2026-11-10T20:00:00.000Z)"
+  },
+  {
+   "label": "the page never complained while it was being dragged",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "label": "the probe appointment is cancelled and retained",
+   "pass": true,
+   "detail": "status 200"
+  },
+  {
+   "label": "and its probe service",
+   "pass": true,
+   "detail": "status 200"
+  },
+  {
+   "label": "and its probe room",
+   "pass": true,
+   "detail": "status 200"
+  },
+  {
+   "label": "and its isolated probe site",
+   "pass": true,
+   "detail": "status 200"
+  },
+  {
+   "label": "and the probe client is archived, not left in the list",
+   "pass": true,
+   "detail": "status 200"
+  }
+ ],
+ "consoleNoise": []
+}

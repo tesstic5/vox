@@ -1,0 +1,54 @@
+{
+  "at": "2026-11-09T10:58:28.558Z",
+  "base": "http://127.0.0.1:3000",
+  "checks": [
+    {
+      "viewport": "desktop",
+      "route": "/dashboard/enquiries",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/dashboard/estimates",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/dashboard/jobs",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "viewport": "desktop",
+      "route": "/dashboard/dispatch",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/dashboard/enquiries",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/dashboard/estimates",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/dashboard/jobs",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "viewport": "mobile",
+      "route": "/dashboard/dispatch",
+      "pass": true,
+      "errors": []
+    }
+  ]
+}

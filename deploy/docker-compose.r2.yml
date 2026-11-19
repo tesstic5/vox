@@ -1,0 +1,80 @@
+# Optional Cloudflare R2 off-box backup overlay.
+#
+# Use together with the base stack after the bucket and restricted credentials
+# exist:
+#   docker compose -f docker-compose.yml -f deploy/docker-compose.r2.yml up -d
+#
+# The base `backup` service creates pg_dump archives and SHA-256 sidecars in the
+# host BACKUP_DIR. This service encrypts file contents and names with rclone crypt,
+# copies only completed files to R2, verifies every local source object exists
+# remotely, and never deletes a remote object. Configure retention in the
+# dedicated R2 bucket rather than mirroring local deletions.
+
+services:
+  r2-backup:
+    image: rclone/rclone:1.75.2
+    restart: unless-stopped
+    depends_on:
+      backup:
+        condition: service_started
+    environment:
+      # S3-compatible Cloudflare R2 remote.
+      RCLONE_CONFIG_R2_TYPE: s3
+      RCLONE_CONFIG_R2_PROVIDER: Cloudflare
+      RCLONE_CONFIG_R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      RCLONE_CONFIG_R2_ENDPOINT: https://${R2_ACCOUNT_ID:-not-configured}.r2.cloudflarestorage.com
+      RCLONE_CONFIG_R2_ACL: private
+      RCLONE_CONFIG_R2_NO_CHECK_BUCKET: "true"
+      # Client-side encrypted remote. This must be an `rclone obscure` value,
+      # retained in an independent password manager; losing it loses recovery.
+      RCLONE_CONFIG_R2CRYPT_TYPE: crypt
+      RCLONE_CONFIG_R2CRYPT_REMOTE: r2:${R2_BUCKET:-not-configured}/${R2_PREFIX:-voxera-postgres}
+      RCLONE_CONFIG_R2CRYPT_PASSWORD: ${R2_CRYPT_PASSWORD:-}
+      RCLONE_CONFIG_R2CRYPT_PASSWORD2: ${R2_CRYPT_PASSWORD2:-}
+      RCLONE_CONFIG_R2CRYPT_FILENAME_ENCRYPTION: standard
+      RCLONE_CONFIG_R2CRYPT_DIRECTORY_NAME_ENCRYPTION: "true"
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID:-}
+      R2_BUCKET: ${R2_BUCKET:-}
+      R2_SYNC_INTERVAL_SECONDS: ${R2_SYNC_INTERVAL_SECONDS:-900}
+      R2_MIN_AGE: ${R2_MIN_AGE:-2m}
+    volumes:
+      - ${BACKUP_DIR:-./backups}:/backups:ro
+      - voxera-ops:/app/data
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        : "$${R2_ACCOUNT_ID:?set R2_ACCOUNT_ID in Dokploy secrets}"
+        : "$${R2_BUCKET:?set R2_BUCKET in Dokploy secrets}"
+        : "$${RCLONE_CONFIG_R2_ACCESS_KEY_ID:?set R2_ACCESS_KEY_ID in Dokploy secrets}"
+        : "$${RCLONE_CONFIG_R2_SECRET_ACCESS_KEY:?set R2_SECRET_ACCESS_KEY in Dokploy secrets}"
+        : "$${RCLONE_CONFIG_R2CRYPT_PASSWORD:?set R2_CRYPT_PASSWORD in Dokploy secrets}"
+        : "$${RCLONE_CONFIG_R2CRYPT_PASSWORD2:?set R2_CRYPT_PASSWORD2 in Dokploy secrets}"
+        status=/app/data/backups/r2-status.json
+        mkdir -p /app/data/backups
+        while true; do
+          attempted="$$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          # status.json changes after every base backup, so it must never enter an
+          # immutable copy set. Transfer only completed PostgreSQL archives and
+          # their checksum sidecars; hidden temporary dumps match neither filter.
+          if rclone copy /backups r2crypt: \
+               --min-age "$${R2_MIN_AGE}" --immutable --transfers 2 --checkers 4 \
+               --include 'voxera-postgres.*.dump' \
+               --include 'voxera-postgres.*.dump.sha256' --exclude '*' \
+             && rclone check /backups r2crypt: \
+               --min-age "$${R2_MIN_AGE}" --one-way --size-only --checkers 4 \
+               --include 'voxera-postgres.*.dump' \
+               --include 'voxera-postgres.*.dump.sha256' --exclude '*'; then
+            printf '{"ok":true,"attemptedAt":"%s","lastSuccessAt":"%s","destination":"r2crypt:"}\n' \
+              "$${attempted}" "$$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$${status}.tmp"
+          else
+            printf '{"ok":false,"attemptedAt":"%s","destination":"r2crypt:"}\n' \
+              "$${attempted}" > "$${status}.tmp"
+          fi
+          mv "$${status}.tmp" "$${status}"
+          sleep "$${R2_SYNC_INTERVAL_SECONDS}"
+        done
+    stop_grace_period: 30s
+    mem_limit: ${R2_MEMORY_LIMIT:-256m}
+    cpus: ${R2_CPUS:-0.5}

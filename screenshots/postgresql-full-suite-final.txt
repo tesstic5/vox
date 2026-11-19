@@ -1,0 +1,1997 @@
+Voxera final local PostgreSQL acceptance artifact
+==================================================
+Recorded: 2026-11-07 (Asia/Karachi); gate logs ran 2026-11-06 UTC
+Target: exact optimized Next.js 16.4.3 build + PostgreSQL 17.11 on loopback
+Fresh migration: 124,459 documents across 59 collections, count + SHA-256 digest verified
+Live command: VOXERA_STORE=postgres DATABASE_URL=<redacted disposable local target> VOXERA_PUBLIC_URL=https://pilot.example.test python3 scripts/check.py --keep-going
+Live result: 43/43 gates green; 1,560 checks passed; 0 failed; wall time 395.415 seconds
+Offline command (application stopped): env -u VOXERA_STORE -u DATABASE_URL npm run check:offline
+Offline result: 2/2 gates green; 18 checks passed; 0 failed
+Post-suite database: 126,706 documents across 63 collections
+Ownership fixed-number residue: 0 rows
+
+The following are the raw per-gate stdout/stderr logs retained by scripts/check.py.
+Secrets are not printed by these gates. Deterministic local provider stubs do not
+prove live delivery, settlement, provider reliability, compliance, or Dokploy.
+
+
+===== smoke.txt =====
+— marketing surface ————————————————————————
+PASS  GET /  — status 200
+PASS  GET /pricing  — status 200
+PASS  GET /docs  — status 200
+PASS  GET /blog  — status 200
+PASS  GET /careers  — status 200
+PASS  GET /customers  — status 200
+PASS  GET /integrations  — status 200
+PASS  GET /templates  — status 200
+PASS  GET /compare  — status 200
+PASS  GET /status  — status 200
+PASS  GET /trust  — status 200
+PASS  GET /security  — status 200
+PASS  GET /terms-of-service  — status 200
+
+— dashboard (signed out still renders, shell is client-side) ————————
+PASS  GET /dashboard  — status 200
+PASS  GET /dashboard/assistants  — status 200
+PASS  GET /dashboard/calls  — status 200
+PASS  GET /dashboard/numbers  — status 200
+PASS  GET /dashboard/carriers  — status 200
+PASS  GET /dashboard/analytics  — status 200
+PASS  GET /dashboard/keys  — status 200
+PASS  GET /dashboard/logs  — status 200
+PASS  GET /dashboard/webhooks  — status 200
+PASS  GET /dashboard/settings  — status 200
+
+— public demo line (no signup) ————————————————————————
+PASS  demo call created anonymously  — status 201 
+PASS  demo returns a signed token  — 1794008101746.BRFaSyf_7U
+PASS  demo turn answered on the real pipeline  — status 200 event: stt.final
+data: {"type":"stt.final","text":"Where is 
+PASS  demo call ended  — status 200
+PASS  demo call is closed to further turns  — status 405
+
+— session ————————————————————————————————————————
+PASS  anonymous /api/auth/me reports it plainly  — status 200
+PASS  login  — status 200 
+PASS  assistants listed  — Support concierge
+
+— streamed turn path ————————————————————————————————
+PASS  call created  — status 201 call_337b3ba19cf9
+PASS  streamed turn returned SSE  — status 200
+PASS  event order is stt → intent → tool → tts → deltas → recorded  — stt.final → intent → tool.start → tool.end → tts.start → assistant.delta → assistant.delta → assistant.delta…
+PASS  turn.recorded is last  — turn.recorded
+PASS  telemetry accepted  — status 200
+
+— conversation memory —————————————————————————————————
+PASS  an assistant with calendar tools exists  — Appointment desk
+PASS  turn answers: 'I need to reschedule my appointmen'  — I have Saturday 8:00am, Monday 3:45pm on that day. Which works best?
+PASS  turn answers: 'Thursday works'  — I have 9:00am, 9:15am, 9:30am, 9:45am, 10:00am, 10:15am on Thursday wi
+PASS  turn answers: 'make it 2pm instead'  — Booked: vox-mw5l16gg for Appointment on Thursday, November 12 at 2:00 
+PASS  turn answers: "no that's everything, thanks"  — Thanks for calling Northwind Labs — you'll get a summary by text. Have
+PASS  every turn produced words  — 4 replies
+PASS  the dialogue used the calendar tools  — tools=['lookup_order', 'check_availability', 'lookup_order', 'check_availability']
+PASS  the dialogue recorded what it learned  — {"date": "Thursday", "appointment": "Thursday at 2pm", "time": "2pm"}
+PASS  the call says which engine answered  — rules
+
+— metering, metrics, plumbing ——————————————————————————
+PASS  call ends cleanly  — status 200 
+PASS  call cost fields reconcile without inventing unavailable provider charges  — total $0 · components $0
+PASS  call has a transcript  — 9 turns
+PASS  call duration is measured, not guessed  — 1s
+PASS  metrics return percentiles  — status 200
+PASS  usage window sums minutes  — 26.87 minutes
+PASS  webhook deliveries are logged  — 20 deliveries
+PASS  native analytics exports is readable  — status 200
+PASS  native workspace audit is readable  — status 200
+PASS  native operations board is readable  — status 200
+
+— telephony ——————————————————————————————————————
+PASS  numbers listed  — 2 numbers
+PASS  carriers endpoint answers  — 0 connected
+PASS  media pipeline reports its own readiness  — transcriber simulated
+PASS  outbound is explicit about who is dialling  — status=409 dialled=None via=None reason=No active carrier-backed workspace number is available as caller ID.
+
+ALL SMOKE CHECKS PASS
+
+
+===== api_check.txt =====
+PASS  sign in  — session cookie
+
+— list envelope ————————————————————————————
+PASS  /api/v1/numbers uses the canonical envelope  — keys=['data', 'has_more', 'object', 'total']
+PASS  /api/v1/keys uses the canonical envelope  — keys=['data', 'has_more', 'object', 'total']
+PASS  /api/v1/bookings uses the canonical envelope  — keys=['data', 'hasMore', 'has_more', 'object', 'stats', 'total']
+PASS  /api/v1/calls uses the canonical envelope  — keys=['applied_filters', 'data', 'has_more', 'object', 'total']
+PASS  /api/v1/files uses the canonical envelope  — keys=['data', 'has_more', 'object', 'total']
+
+— documented call filters ————————————————————
+PASS  a filter really narrows the page  — 92 of 2150 are `assistant-ended-call`
+PASS  the documented `in:` operator works  — 92 rows
+PASS  numeric comparisons work (`durationSecondsGt`)  — 100 rows over a second
+PASS  sort=…:asc is honoured, not ignored  — ['2026-09-08T08:59:54.000Z', '2026-09-08T09:04:24.000Z']
+PASS  an unknown filter field is refused rather than ignored  — HTTP 400 · VALIDATION_ERROR
+
+— tools —————————————————————————————————————
+PASS  create a tool  — HTTP 201
+PASS  a tool endpoint behind the outbound policy is refused honestly  — blocked by URL policy: 127.0.0.1 is a private or loopback address
+PASS  update a tool  — HTTP 200
+PASS  tool appears in the list with usedBy  — usedBy=[]
+PASS  delete a tool reports detach count  — HTTP 200
+PASS  deleted tool is gone
+PASS  tool names are validated  — HTTP 400 · VALIDATION_ERROR
+
+— squads ————————————————————————————————————
+PASS  create a squad  — HTTP 201
+PASS  members resolve to assistant names  — [{'assistantId': 'asst_e49a910501', 'name': 'Support concierge'}, {'assistantId': 'asst_f52bca00019b', 'name': 'api_check assistant'}]
+PASS  reorder members  — ['asst_f52bca00019b', 'asst_e49a910501']
+PASS  unknown members are rejected  — HTTP 400
+PASS  delete a squad
+PASS  probe assistant removed
+
+— analytics ————————————————————————————————
+PASS  overview computes real totals  — calls=1677 minutes=26.87 cost=0.0000
+PASS  overview is consistent with the call list  — analytics=1677 calls_total=2150
+PASS  costs break down by component without inventing provider attribution  — total=$0.0000 componentTotal=$0.0000 providerAttribution=False
+PASS  outcomes report intents, endings and tools  — intents=6 bookings=406
+
+— assistant knowledge ———————————————————————
+PASS  attach a snippet  — HTTP 200
+PASS  snippet is readable back and reaches the assistant  — 5 snippets
+PASS  restored the assistant's original knowledge
+PASS  unknown file ids are rejected  — HTTP 400
+
+— rate limiting ————————————————————————————
+PASS  login is rate limited per client  — codes=[401, 401, 401, 401, 401, 401, 401, 401, 401, 401, 429, 429]
+PASS  signup is rate limited too  — codes=[400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 429, 429, 429]
+
+— security headers —————————————————————————
+PASS  / carries a CSP  — default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self…
+PASS  / carries nosniff + referrer policy  — nosniff=nosniff referrer=strict-origin-when-cross-origin
+PASS  /dashboard carries a CSP  — default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self…
+PASS  /dashboard carries nosniff + referrer policy  — nosniff=nosniff referrer=strict-origin-when-cross-origin
+
+API CHECK: ALL PASS
+
+
+===== admin_check.txt =====
+PASS  anonymous gets no platform view  — HTTP 401
+PASS  the demo owner is flagged as operator  — platformOperator=True
+PASS  the overview answers for the operator  — orgs=2 users=3 calls=2151
+PASS  the demo workspace reads real usage  — calls=2150 members=2
+PASS  queue and store health are reported  — docs=124492
+PASS  a stranger can sign up a workspace  — HTTP 201
+PASS  a workspace owner who is not the operator is refused  — HTTP 403
+PASS  the stranger's workspace works before suspension  — HTTP 200
+PASS  the operator can suspend it  — HTTP 200
+PASS  a suspended workspace's API access is refused  — HTTP 403 code=ORG_SUSPENDED
+PASS  the operator is never locked out, and sees the suspension  — HTTP 200
+PASS  the operator can reactivate it  — HTTP 200
+PASS  a reactivated workspace works again  — HTTP 200
+PASS  the operator cannot suspend their own workspace  — HTTP 400
+PASS  an unknown workspace is a 404  — HTTP 404
+
+ALL PASS — operator console
+
+
+===== totp-vectors.txt =====
+PASS  T=59s → 287082 (RFC 287082)
+PASS  T=1111111109s → 081804 (RFC 081804)
+PASS  T=1111111111s → 050471 (RFC 050471)
+PASS  T=1234567890s → 005924 (RFC 005924)
+PASS  T=2000000000s → 279037 (RFC 279037)
+PASS  T=20000000000s → 353130 (RFC 353130)
+PASS  base32 round-trips the seed
+PASS  current and previous step accepted
+PASS  wrong, short and two-steps-old codes refused
+
+ALL PASS — TOTP matches RFC 6238
+
+
+===== security_check.txt =====
+PASS  2FA starts off for a new account  — HTTP 200
+PASS  setup mints a secret  — HTTP 200
+PASS  a wrong enrolment code is refused  — HTTP 400
+PASS  the right code enables 2FA with 8 recovery codes  — HTTP 200, 8 codes
+PASS  me reports the live factor  — HTTP 200
+PASS  password alone now earns a challenge, not a session  — HTTP 200
+PASS  and there is genuinely no session behind it  — HTTP 200
+PASS  a wrong sign-in code is refused  — HTTP 401
+PASS  the right code signs in  — HTTP 200
+PASS  a recovery code signs in  — HTTP 200
+PASS  and the same recovery code never works twice  — HTTP 401
+PASS  disabling with a wrong password is refused  — HTTP 401
+PASS  disabling with password + code works  — HTTP 200
+PASS  and the password alone signs in again  — HTTP 200
+PASS  a cross-origin cookie POST is refused  — HTTP 403
+PASS  the same request same-origin is not refused for its origin  — HTTP 400
+PASS  an oversized JSON body is refused 413  — HTTP 413
+PASS  five wrong passwords are plain refusals  — [401, 401, 401, 401, 401]
+PASS  the sixth attempt is throttled even with the right password, from a new IP  — HTTP 429
+
+ALL PASS
+
+
+===== auth_check.txt =====
+auth check against http://127.0.0.1:3000
+  PASS  the demo owner can sign in
+
+1. invitations — the way a new colleague gets in
+  PASS  inviting somebody creates the login
+  PASS  the inviter is told the link went out
+  PASS  a one-time password is still issued as the fallback
+  PASS  the invitation email carries an /invite/ link
+  PASS  the invitation email names the workspace
+  PASS  the invitation screen can read the link
+  PASS  it names the invited address
+  PASS  it names the workspace and the inviter
+  PASS  the role comes from the invitation, not the invitee
+  PASS  a too-short password is refused before anything is spent
+  PASS  accepting joins the workspace and signs them in
+  PASS  they arrive signed in as themselves
+  PASS  accepting verifies the address they proved they can read
+  PASS  they hold the role the inviter chose
+  PASS  the one-time password stops working once a real one is chosen
+  PASS  the invitation works exactly once
+  PASS  the temporary password signs them in when the email has not been opened
+  PASS  that account is unverified until they accept the invitation
+  PASS  declining cancels the link
+  PASS  a declined invitation cannot be accepted
+  PASS  the dashboard's pending list shows the live link
+  PASS  it says who invited them and when it lapses
+  PASS  cancelling a link takes it off the list
+  PASS  and the list agrees
+  PASS  sending it again mints a fresh link
+  PASS  and the new link is the one in the inbox
+
+2. password reset — a link that works once and ends every session
+  PASS  a reset can be requested without a session
+  PASS  the answer says how long the link lasts
+  PASS  the response never contains the token
+  PASS  the reset link is emailed
+  PASS  the email explains the session rule
+  PASS  the reset screen reads the link
+  PASS  and knows whose password this is
+  PASS  a short password is refused
+  PASS  and the link survives a failed attempt
+  PASS  a session taken before the reset works
+  PASS  the reset is accepted
+  PASS  it reports the sessions it ended
+  PASS  the browser doing the reset gets a fresh session
+  PASS  the session from before the reset is dead on a real route
+  PASS  the old password stops working
+  PASS  the new password works
+  PASS  the link cannot be used twice
+  PASS  and the screen says so in a sentence
+  PASS  an unknown address gets the same answer
+  PASS  with the same shape as a real one
+  PASS  and nothing is sent to it
+  PASS  the known-address request did send one
+
+3. magic link — requested by mail, spent on a click
+  PASS  a sign-in link can be requested
+  PASS  the response never contains the token
+  PASS  the link is emailed
+  PASS  the email promises the click, not the open
+  PASS  the landing page can check it without spending it
+  PASS  checking twice does not use it up
+  PASS  pressing the button signs in
+  PASS  as the right person
+  PASS  the link cannot be used twice
+  PASS  an anonymous visitor is told they are anonymous
+
+4. email verification — six digits, five tries, then an hour
+  PASS  a new account starts unverified
+  PASS  the verify screen reads its own state
+  PASS  it knows the address the code goes to
+  PASS  a code is sent
+  PASS  the response says how many tries are allowed
+  PASS  the code reaches the inbox
+  PASS  the email says what verifying unlocks
+  PASS  a wrong code reports the attempts left
+  PASS  the fifth wrong guess locks the code
+  PASS  re-sending cannot clear the counter
+  PASS  the screen reports the lock and when it ends
+  PASS  even the right code is refused while locked
+
+5. what verification gates — publish, numbers, keys
+  PASS  a second account starts unverified
+  PASS  drafting an agent still works unverified
+  PASS  and the answer says why it is a draft
+  PASS  publishing is refused
+  PASS  the refusal names the address to verify
+  PASS  buying a number is refused
+  PASS  creating an API key is refused
+  PASS  everything that is not gated still works
+  PASS  the code for this account is emailed
+  PASS  the code verifies the account
+  PASS  the answer lists what just unlocked
+  PASS  publishing works the moment it is verified
+  PASS  and so does creating a key
+  PASS  a verified account is not sent another code
+
+6. the seeded workspace, the audit trail, and the screens
+  PASS  the demo owner is signed in and verified
+  PASS  the trail records auth.reset_requested
+  PASS  the trail records auth.password_reset
+  PASS  the trail records auth.magic_link_used
+  PASS  the trail records team.invite_sent
+  PASS  the trail records team.invite_accepted
+  PASS  the trail records team.invite_declined
+  PASS  the new workspace's trail records auth.verification_sent
+  PASS  the new workspace's trail records auth.email_verified
+  PASS  the reset request screen renders
+  PASS  the magic-link screen renders
+  PASS  the verify screen renders
+  PASS  the sign-in screen renders
+  PASS  the old hard-coded invitation link still renders
+  PASS  and that link is genuinely not valid
+  PASS  no screen offers a demo link that skips the flow
+
+sweep
+  deactivated probe login probe.auth.1794006349@northwind.test
+  deactivated probe login probe.fallback.1794006349@northwind.test
+  deactivated probe login probe.pending.1794006349@northwind.test
+
+Probe workspaces from the signup paths are left for the standing sweep:
+  npx tsx scripts/tidy-probe-orgs.ts --apply   (stop the app first; dry run without --apply)
+
+101 PASS / 0 FAIL
+
+
+===== onboard_check.txt =====
+PASS  a stranger can sign up  — status 201, new workspace
+PASS  signup creates the workspace  — Sunrise Dental
+PASS  the workspace is initialised on first load  — status 201
+PASS  setup state is readable immediately  — 0/5 done
+PASS  a typed signup still asks for locale details  — Dental practice selected · locale details still need review
+PASS  a new production workspace has no invented demo history  — None
+PASS  the owner can complete the typed business profile  — status 200 type=dental
+PASS  dental recommendations do not enable unrelated field-service or developer modules  — customers, schedule, communications, money, reports, clinical_notes, assistants
+PASS  an unverified account can still draft an agent  — status 201 agent=draft
+PASS  publishing is refused until the address is verified  — status 403 Verify founder@sunrise-dental.example before this: open Dash
+PASS  buying a number is refused until the address is verified  — status 403
+PASS  a six-digit code is emailed  — status 200 code=sent
+PASS  a wrong code is refused, with the attempts left  — That code is not right. 4 attempts left before it locks for an hour.
+PASS  the code verifies the account
+PASS  publishing works the moment the address is verified  — status 200
+PASS  setup state is still readable once work has begun  — 2/5 done
+PASS  the wizard lists profile-relevant use cases  — Confirm and reschedule bookings, Answer support calls
+PASS  telephony mode is reported honestly  — mode=none hint=No carrier is connected. Connect one under Carriers, or set 
+PASS  a use case produces an agent  — status 201 
+PASS  a new agent starts as a draft for review  — draft
+PASS  the draft has no invented business policies  — []
+PASS  the agent has the tools its job needs  — 10 tools
+PASS  the business name reached the greeting  — Hi, this is Sunrise Dental calling about your appointment — is now sti
+PASS  a draft is not reported as published  — Draft created — review and publish it when ready
+PASS  explicit publishing succeeds after verification  — status 200
+PASS  the checklist notices the published agent  — Booking desk is published
+PASS  the workspace connects a carrier  — status 201 
+PASS  area-code search returns inventory  — 15 numbers for San Francisco, CA
+PASS  inventory is labelled with its locality  — {'number': '+14155550301', 'locality': 'San Francisco', 'region': 'CA', 'monthly
+PASS  the number is bought on the first try  — status 201 
+PASS  the number is stored with its carrier  — car_44e1bd412d7f
+PASS  the number is assigned to the agent  — asst_f0f40c3ead
+PASS  the purchase says which account it used  — workspace
+PASS  buying the same number twice is not a second purchase  — reused=True
+PASS  the carrier was told where to send calls  — 5 carrier request(s)
+PASS  voice webhooks were set at purchase time  — POST /2010-04-01/Accounts/AC_REDACTED_STUB_SID/IncomingPhoneNumbers.json
+PASS  the browser test call opens  — status 201 
+PASS  the agent answers on the very first call  — I have 9:15am, 11:40am, 2:00pm, 4:30pm on tomorrow. Which works best?
+PASS  the call is on the record as a test  — onboarding
+PASS  the record names the engine that answered  — rules
+PASS  ringing your own phone works  — CAstub000179
+PASS  the dial really left through the carrier  — 1 call(s) at the carrier
+PASS  agent step is done  — Booking desk is published
+PASS  number step is done  — 1 number bought
+PASS  first-call step is done  — 2 calls you started
+PASS  every actionable onboarding step this run opened is now closed  — open before: ['first_call', 'number', 'operations'] · still open: ['operations']
+PASS  any unfinished setup is named rather than hidden  — still open: ['operations']
+PASS  the disabled developer module adds no pretend webhook step  — business_profile, operations, assistant, number, first_call
+PASS  progress is reported as a number  — 80%
+PASS  signup invents no active API key  — 0 active / 0 historical
+PASS  the verified owner can create a scoped key explicitly  — status 201
+PASS  the new workspace can take its own bookings  — created=1
+PASS  a campaign can be created against the new agent  — status 201 
+PASS  and it warns about nothing missing  — []
+PASS  the new workspace sees who it would ring  — would call 1
+PASS  the number is given back at the end  — status 200 
+
+ALL ONBOARDING CHECKS PASS
+
+
+===== practice_check.txt =====
+PASS  sign in to the demo workspace  — session cookie
+PASS  bootstrap reports the practice layer  — {"seeded": false, "reason": "setup_required"}
+PASS  practice records exist and read back  — 3 providers, 8 services, 2 sites, 4 rotas
+PASS  profile carries the vocabulary  — service
+PASS  switching to the clinical pack renames the interface, not the data  — {"one": "practitioner", "many": "practitioners", "One": "Practitioner", "Many": "Practitioners"}
+PASS  the pack travels with the list the caller reads  — {"one": "patient", "many": "patients", "One": "Patient", "Many": "Patients"}
+PASS  the seeded services carry duration and buffers  — install 30m +15m
+PASS  no two services share a name  — 0 duplicate(s) of 8
+PASS  every service on the list is offered by a practitioner  — 8 service(s), all rostered
+PASS  a working day offers slots  — 26 slots on 2026-11-09
+PASS  every slot sits inside the working window  — 9:00am–9:30am, 9:15am–9:45am, 9:30am–10:00am
+PASS  the lunch break is not bookable  — 0 slots overlap 12:00–13:00
+PASS  slots name who and where  — Dana Whitfield
+PASS  a non-working day is refused with a reason  — Nothing free between 2026-11-07 and 2026-11-07.
+PASS  a day off can be added
+PASS  the day off closes that weekday  — 0 slots on 2026-11-10
+PASS  only that provider's day is affected  — 5 slots for everyone else
+PASS  removing the day off reopens it  — 20 slots
+PASS  extra hours can be added on a closed day
+PASS  the extra window is what gets offered  — 10 slots, first 10:00am
+PASS  removing the extra hours closes the day again
+PASS  a Los Angeles 9am is not 9am UTC  — local 9:00am = 17:00Z
+PASS  the site's timezone is echoed  — America/Los_Angeles
+SKIP  DST boundary — this three-week window does not cross a transition ([(datetime.date(2026, 11, 9), '9:00am', 480), (datetime.date(2026, 11, 30), '9:00am', 480)])
+PASS  the New York site runs on its own hours  — 26 slots, first 10:00am NY
+PASS  site filtering never leaks the other site  — 26 slots
+PASS  the service duration sets the appointment length  — lengths seen: [30]
+PASS  a slot can be booked from the diary
+PASS  the booking inherits the service's price and duration  — value 180, 30m
+PASS  a double booking is refused  — 409 That slot is not free.
+PASS  the booked slot disappears from availability  — 18 left of 22
+PASS  the after-buffer keeps the next appointment clear  — closest next start is 30 min after (buffer 15)
+PASS  the diary view can still show what is taken  — 4 taken slot(s)
+PASS  only providers who do the service are offered  — Marcus Ito, Priya Raman
+PASS  Marcus, who does installations, is offered  — 60 slots
+PASS  a provider who cannot do the service has no slots  — No one offers Consultation.
+PASS  a room record can be prepared at the site  — Practice Check Room Probe at Northwind HQ — San Francisco
+PASS  the same name twice at one site is refused  — 400
+PASS  the site's room list follows the record  — Practice Check Room Probe, Bay Room, Mission Room
+PASS  renaming a room keeps the id its appointments point at  — room_ae22fceb9c748feb → Practice Check Room Probe Renamed
+PASS  a room with appointments to come cannot be deleted  — 409 That room still has 1 appointment to come. Retire it instead and it will stop being offered.
+PASS  a retired room stops being offered  — Bay Room, Mission Room
+PASS  with no future booking, the room retires without erasing historical labels  — 200 · retained=True · references=1
+PASS  a slot says which room it is in  — Bay Room
+PASS  the room the diary offered is the room it records  — Bay Room → room_36d47e6cef555132
+PASS  the diary names the room  — Bay Room
+PASS  the diary names the site  — Northwind HQ — San Francisco
+PASS  the diary offers every site it covers  — Northwind East — New York, Northwind HQ — San Francisco
+PASS  the appointment assistant is available  — Appointment desk
+PASS  a test call can be started
+PASS  the agent reaches for availability  — lookup_order, check_availability
+PASS  the agent's day is the next Thursday  — 2026-11-12 (expected 2026-11-12)
+PASS  the agent's slots come from the diary, not a fixed list  — 1:00pm, 1:15pm, 1:30pm, 1:45pm
+PASS  the agent can say who it is booking with  — Dana Whitfield
+PASS  the spoken answer quotes a real slot  — Caller, you are down for Appointment on Tuesday, November 3 at 2:00 PM, reference vox-mw0g34g5. Is that still good?
+
+ALL PASS — the diary honours rotas, one-off changes, buffers, timezones and clashes, and the agent answers from it.
+
+
+===== practice_team_check.txt =====
+PASS  sign in as the owner  — session cookie
+PASS  the team lists real logins  — 5 member(s)
+PASS  each row says what the person may do and how to reach them  — owner, receptionist, receptionist, practitioner, developer
+PASS  the permission table says who may do what  — clients.edit, diary.run, money.edit, money.read, money.take, notes.read, notes.write, practice.config, team.manage
+PASS  the front desk may not read clinical notes  — receptionist absent from notes.read
+PASS  the front desk may take a payment  — receptionist present in money.take
+PASS  a viewer may not edit money  — viewer absent from money.edit
+PASS  somebody can be added to the workspace  — Locum Probe as receptionist
+PASS  the invite hands back a one-time password and never a hash  — 16 characters
+PASS  the added person is on the team list  — present
+PASS  a role that does not exist is refused  — 400 `role` must be one of: owner, admin, developer, receptionist, practitioner, viewer.
+PASS  the front desk can sign in  — 200
+PASS  the front desk can add a client record  — 201
+PASS  the front desk cannot change practice setup  — 403 This account can run the diary but not change practice configuration. Ask an owner or admin.
+PASS  the front desk cannot manage the team  — 403 This account can run the diary but not change practice configuration. Ask an owner or admin.
+PASS  the front desk sees that notes exist, not what they say  — 2 restricted row(s)
+PASS  the last owner cannot be demoted  — 409 This is the workspace's only owner. Give somebody else owner access first, or th
+PASS  the last owner cannot be deactivated  — 409 This is the workspace's only owner — deactivating it would lock everyone out.
+PASS  you cannot deactivate your own login  — 409 This is the workspace's only owner — deactivating it would lock everyone out.
+PASS  a password can be reset and is shown once  — 16 characters
+PASS  the one-time password actually signs in  — 200
+PASS  a login can be deactivated  — 200 · 1 session(s) ended
+PASS  deactivating ends the sessions it was holding  — 1 live before, 1 ended
+PASS  a deactivated login can no longer sign in  — 403
+PASS  and can be brought back  — locum@northwind.dev
+PASS  a role can be changed, and the change is what comes back  — locum@northwind.dev → practitioner
+PASS  the team list agrees with the change  — on the list
+PASS  the board answers for every site  — 2 site(s) on 2026-11-10
+PASS  a site shows who is on the rota that day  — Northwind East — New York, Northwind HQ — San Francisco
+PASS  each person on the board carries their hours  — 2 on duty
+PASS  the board counts the day's visits  — 0 visit(s), 0 confirmed
+PASS  rooms are shown, and each says whether it is in use  — 1 room(s): Hudson Room free
+PASS  the site says which clock it is running on  — America/New_York · 18:07
+PASS  asking for one site returns one site  — Northwind HQ — San Francisco
+PASS  the team can post a note to the board  — Practice Check Note
+PASS  pinned notes come back at the top  — Practice Check Note
+PASS  a note says who wrote it and when  — jordan@northwind.dev
+PASS  the import reports what it would do before it does it  — 2 to add · 0 already here · 2 unreadable
+PASS  a quoted name with a comma is read as one field  — Import Probe 1794006420, Probe, Comma
+PASS  unreadable rows name their line  — line 4: "" is not a usable phone number.; line 5: No name on this row.
+PASS  the dry run wrote nothing  — 0 record(s) on file
+PASS  the real import adds exactly the rows it promised  — 2 added
+PASS  the imported client is on file, with their number normalised  — Import Probe 1794006420 +14155556420
+PASS  importing the same file twice adds nobody  — 0 added · 2 already here
+PASS  no duplicate record was created  — 1 record(s)
+PASS  the client list exports as a real file  — attachment; filename="clients_2026-11-06.csv"
+PASS  the file has a header and the rows it promised  — 146 data row(s), 147 line(s)
+PASS  the imported client is in it  — present
+PASS  the diary exports for the range it was given  — 262 appointment(s) between 2026-10-07 and 2026-11-13
+PASS  every exported appointment is inside the range  — 262 row(s) checked
+PASS  a narrower range is a smaller file  — 4 row(s) on 2026-11-10 vs 262 in the month
+PASS  the practice runs more than one site  — 2 site(s), East = Northwind East — New York
+PASS  the caller's site reaches the booking  — Northwind East — New York
+PASS  the site is named back to the caller  — Appointment on Thursday, December 24 at 10:00 AM at Northwind East — N
+PASS  the appointment is on the site's own diary  — loc_9a322d90e17563a0 vs loc_9a322d90e17563a0
+PASS  any room it takes is one of that site's  — room Hudson Room
+PASS  one visit occupies every site room at 2pm  — 1/1 room(s)
+PASS  a move into a full site is refused, and says where  — Every room at Northwind East — New York is taken at that time.
+PASS  the appointment did not move after all  — 2026-12-24T10:00:00
+PASS  a move that has a room goes through  — Appointment on Thursday, December 24 at 4:00 PM at Northwind East — Ne
+PASS  the confirmation still says which building  — Appointment on Thursday, December 24 at 4:00 PM at Northwind East — Ne
+PASS  the room moved with the time rather than being left behind  — room Hudson Room
+PASS  the diary shows the new hour  — 2026-12-24T10:00:00 → 2026-12-24T16:00:00
+PASS  adding somebody to the team is in the workspace trail  — team.invited
+PASS  a role change is in the workspace trail  — team.role_changed
+PASS  a login being taken away is in the workspace trail  — team.deactivated
+PASS  a note posted to the board is in the workspace trail  — board.note_created
+PASS  the import is written down with its counts  — clients.imported
+
+ALL PASS — a team can be hired, scoped and taken away across two sites, the board runs the day, and records import and export without inventing or losing anybody.
+
+
+===== client_check.txt =====
+PASS  sign in
+PASS  practice data is present  — 3 providers, Consultation
+PASS  a slot is available to book  — 9:00am
+PASS  the appointment is booked
+PASS  the booking is attached to a client record  — cli_mihtp25rwr
+PASS  the client is findable by number  — 1 match(es)
+PASS  the same number never becomes a second client  — 1 match(es)
+PASS  the day view answers  — 1 day(s)
+PASS  the new appointment is on the grid  — 4 block(s) that day
+PASS  a block carries what the calendar draws it with  — Dana Whitfield 720→750
+PASS  a block knows its client  — Probe Client 8916
+PASS  3-day, work-week and week views span the right number of days  — 3 / 5 / 7
+PASS  a work week starts on the practice's configured week start  — starts 2026-11-09 (weekday 0, weekStart 1)
+PASS  filtering by provider hides everyone else's diary  — 0 leaked block(s)
+PASS  moving outside working hours is refused  — 409 not working on 2026-11-08 at Northwind HQ — San Francisco
+PASS  moving onto the lunch break is refused  — 409 that time is Lunch
+PASS  moving to a free slot is accepted  — 200 
+PASS  resizing is recorded as a change  — 60m
+PASS  confirmed → arrived is allowed  — 200 
+PASS  arrived → completed is allowed  — 200 
+PASS  completed → no-show is refused  — 409 An appointment that is `completed` cannot become `no_show`. Allowed: confirmed.
+PASS  a weekly series is created  — 201 4 booked, 0 skipped
+PASS  the series is queryable as a group  — 4 of 4
+PASS  an alert can be added
+PASS  the alert shows on the diary block  — 2 flagged block(s)
+PASS  SMS consent can be withdrawn
+PASS  a published assistant with a confirmation tool is on file  — Support concierge:4, Appointment desk:11, Renewals outbound:3
+PASS  the agent cannot text a client who opted out  — {"queued": false, "blocked": true, "reason": "Probe Client 8916 has opted out of sms", "to": "+141555528916", "channel": "sms", "note": "Do not promise a messag
+PASS  and it is told what to do instead  — Probe Client 8916 has opted out of sms
+PASS  reading the record is written to its own log  — consent, create, update, view
+PASS  the alert and the consent change are in that log  — consent, create, update, view
+PASS  the log names who did it  — jordan@northwind.dev
+PASS  a client with upcoming appointments cannot be archived  — 409 Probe Client 8916 has 5 upcoming appointment(s). Cancel or move them first. (they had 0 upcoming)
+PASS  archiving never invents an unconfigured retention deadline  — 200 until=automatic purge disabled · source=none
+PASS  archived records are hidden by default and visible on request  — 0 default, 1 with archived
+PASS  an archived record can be restored
+PASS  someone can be put on the wait list
+PASS  the wait list reads back  — 2 waiting
+PASS  a wait-list entry is also a client  — cli_or5bzyk85e
+PASS  cancelling surfaces the people waiting for that slot  — 1 match(es)
+PASS  every path the practice screens call is a real route  — 64 path(s) checked
+PASS  the practice screens were actually scanned  — lib/store.tsx, lib/server-sync.tsx, app/dashboard/clients/page.tsx, app/dashboard/calendar/page.tsx, lib/privacy.ts
+PASS  the rule is written down, not implied  — lib/privacy.ts
+
+ALL PASS — clients, the calendar, moves, series, consent and the access log all behave.
+
+
+===== booking-client-auth-check.txt =====
+PASS  the owner session is available
+PASS  a practitioner test login exists  — invite=201
+PASS  the practitioner gets a one-time test password  — 200
+PASS  the practitioner signs in as themselves  — 200 
+PASS  a clients read key can be minted  — 201 
+PASS  a clients write key can be minted  — 201 
+PASS  a bookings read key can be minted  — 201 
+PASS  a bookings write key can be minted  — 201 
+PASS  a wrong scope key can be minted  — 201 
+PASS  clients:read can list clients  — 200
+PASS  clients:read cannot write clients  — 403 This key is missing the required scope: clients:write
+PASS  clients:read cannot read bookings  — 403
+PASS  bookings:read can list bookings  — 200
+PASS  bookings:read cannot read clients  — 403
+PASS  an unrelated scope is denied client data  — 403
+PASS  an unrelated scope is denied booking data  — 403
+PASS  clients:write can create a client  — 201 
+PASS  clients:write alone cannot read clients  — 403
+PASS  clients:read can open its client record  — 200
+PASS  a narrow client key cannot piggyback into clinical notes  — True
+PASS  a narrow client key cannot piggyback into money  — True
+PASS  bookings:write can create a booking  — 201 
+PASS  bookings:write alone cannot read bookings  — 403
+PASS  bookings:read can open the new booking  — 200
+PASS  bookings:read cannot mutate a booking  — 403 This key is missing the required scope: bookings:write
+PASS  generic PATCH cannot bypass the conflict-checked move action  — 400 Use the move action to change startsAt so availability and room conflicts are checked.
+PASS  appointment DELETE is non-destructive and refused  — 400 Appointments are historical records and cannot be permanently deleted. Cancel the appointment instead.
+PASS  the refused DELETE leaves the appointment intact  — 200
+PASS  booking creation rejects a non-E.164 number  — 400 `customer.number` must be E.164.
+PASS  booking creation rejects an unsafe duration  — 400 `durationMinutes` must be an integer from 5 to 1440.
+PASS  future provider work cannot disable conflict checks  — 400 `checkConflicts: false` is allowed only for past completed, cancelled, or no-show history.
+PASS  a malformed full snapshot is rejected atomically  — 400 The sync payload contains invalid bookings; nothing was written.
+PASS  the valid row beside a malformed row was not written  — 200 total=0
+PASS  the malformed full snapshot did not mark existing work removed
+PASS  an invalid sync cursor is rejected before writes  — 400 `since` must be a valid ISO timestamp.
+PASS  the invalid cursor produced no hidden write  — total=0
+PASS  a sync rejects duplicate external ids  — 400 The sync payload contains invalid bookings; nothing was written.
+PASS  a practitioner can read client records needed for care  — 200
+PASS  a practitioner cannot create client records  — 403 This account cannot change client or diary records. Ask an owner, admin or receptionist.
+PASS  a practitioner can read the diary  — 200
+PASS  a practitioner cannot create or move diary records  — 403 This account cannot change client or diary records. Ask an owner, admin or receptionist.
+PASS  a practitioner cannot read the workspace security audit  — 403 This account can run the diary but not change practice configuration. Ask an owner or admin.
+PASS  an owner can read the workspace security audit  — 200
+PASS  a revoked key stops working immediately  — 401
+
+PASS  booking/client authorization — 0 failure(s)
+
+
+===== notes_check.txt =====
+PASS  the workspace bootstraps the notes layer  — status 200
+PASS  templates came back  — 94 template(s)
+PASS  there is a general template and one per service  — 1 general · 93 per service
+PASS  the template says what this practice calls a note  — job note
+PASS  every template has named sections  — Attended, Work carried out, Parts and materials, Follow-up
+PASS  a probe visit exists to write up  — bkg_e3cdf8389050574a for +15556446422
+PASS  the note opens against the visit, the client and the service  — status 201 
+PASS  it was written in the service's own template, not a generic one  — Annual service (service template: Annual service)
+PASS  it is a draft, with the author recorded  — draft
+PASS  the template's sections are on the note, with what is required marked  — Attended*, Work carried out*, Parts and materials, Follow-up
+PASS  **a note cannot be signed while it is half-written**  — missing: Attended, Work carried out
+PASS  finalising is refused, and says which sections are blank  — 400 This note is not finished: Attended, Work carried out.
+PASS  and the note is still a draft afterwards  — draft
+PASS  the note saves as a draft  — 0 missing
+PASS  **a complete note can be signed by a person**  — 200 
+PASS  the signature records who and when  — Jordan Reyes at 2026-11-06T23:07:26.510Z
+PASS  signing freezes version 1  — [{"version": 1, "reason": "finalised"}]
+PASS  **a finalised note cannot be edited**  — 409 This note is finalised. A signed note is not edited — amend it, which keeps this version and starts the ne
+PASS  and the refusal says what to do instead  — This note is finalised. A signed note is not edited — amend it, which keeps this version and starts the next.
+PASS  the signed text is untouched by the attempt  — v1 body intact
+PASS  an amendment without a reason is refused  — 400 An amendment needs a reason. A note that changed without one is the thing records systems exist to prevent
+PASS  **amending reopens the note at the next version**  — v2 draft v2
+PASS  the signed version is kept, untouched  — 1 frozen version(s), body intact
+PASS  the reason for the amendment is on the record  — v1 reopened as v2: Corrected the probe wording 46422
+PASS  the reopened draft takes the correction
+PASS  **re-signing leaves both versions in the trail, newest first**  — [{"version": 2, "reason": "amended"}, {"version": 1, "reason": "finalised"}]
+PASS  an attachment is recorded against the note  — 1 attachment(s)
+PASS  with who attached it and when  — jordan@northwind.dev at 2026-11-06T23:07:26.651Z
+PASS  a zero-byte attachment is refused  — 400 An attachment needs a size in bytes.
+PASS  and detaching removes it, keeping the trail  — 0 left
+PASS  the appointment assistant can keep notes  — check_availability, book_appointment, transfer_call, reschedule_appointment, cancel_appointment, lookup_order, send_conf
+PASS  a call about the visit can be started
+PASS  the call ends
+PASS  **the agent leaves a draft note on the visit**  — 1 agent note(s)
+PASS  it is a draft, and it does not pretend otherwise  — draft
+PASS  a person is the one who signs it, so far nobody has  — None
+PASS  ending it twice does not file a second note  — 1 agent note(s)
+PASS  the trail says the agent dictated it, unsigned  — [{"id": "ac_wf2bjjnlzp", "action": "create", "actor": "agent", "actorName": "AI receptionist", "detail": "draf
+PASS  the note carries its own access log  — view, update, update, update, update, view
+PASS  it records the write, the signature and the amendment  — create, update, view
+PASS  the workspace trail kept the refusal and the amendment  — note.amended, note.attachment_added, note.attachment_removed, note.created, note.edited, note.finalised
+PASS  the demo workspace has a front-desk login  — as desk@northwind.dev
+PASS  **the desk can see that a note exists**  — 2 row(s)
+PASS  and is told it is restricted, not handed a redacted document  — {"status": "draft", "restricted": true, "body": null, "preview": null}
+PASS  the desk is told whether each note is signed, and by whom  — 1 signed (Jordan Reyes) · 1 waiting on a signature
+PASS  the same row for a practitioner carries the content  — Summary 1 caller turn captured; no outcome evaluation was run.
+PASS  **a receptionist cannot open the note**  — 403 This note is clinical content. Your role cannot open it — ask a practitioner or the practice own
+PASS  and cannot write clinical content either  — 403 Notes are clinical content. This account can see that a note exists; writing one needs a practit
+PASS  the client record says the same thing  — True
+PASS  the attempt is recorded in the workspace trail  — 1 refusal(s) logged
+PASS  archiving keeps the note rather than deleting it  — 200 
+PASS  retention is explicit rather than an invented default  — until=automatic purge disabled · source=none
+PASS  it leaves the everyday list  — 1 row(s) without it
+PASS  but is still there when asked for  — 2 row(s) with it
+PASS  restoring puts it back as it was — signed is signed  — final
+
+ALL PASS — a finalised note cannot be edited without an amendment version, and a receptionist cannot open it.
+
+
+===== book_check.txt =====
+PASS  login  — session cookie
+PASS  sync accepts or reuses the client's retained diary  — status 200 created=0 updated=3
+PASS  a source-scoped full sync leaves other integrations alone  — removed=0
+PASS  a re-sync is idempotent  — created=0 updated=0 unchanged=3
+PASS  a bad row is rejected with a reason  — The sync payload contains invalid bookings; nothing was written.
+PASS  a booking can be read back by the client's id  — Checkup on Friday, November 6 at 9:07 PM
+PASS  full sync flags what the client dropped  — removed=1
+PASS  the dropped booking is flagged, not deleted  — status=confirmed
+PASS  a booking assistant is available  — Appointment desk
+PASS  campaign created paused  — status 201 
+PASS  due bookings are inside the window  — due now=2
+PASS  the far-away appointment is not due  — due=['CHK-1', 'CHK-2']
+PASS  a dry run dials nothing  — skipped=2 2 booking(s) would be dialled.
+PASS  the dry run names who it would call  — ['CHK-1', 'CHK-2']
+PASS  a paused campaign refuses to dial  — This campaign is paused. PATCH it to `active` before dialling, or run 
+PASS  outside calling hours nothing dials  — None
+PASS  stub carrier connected for the dial half  — CHK carrier
+PASS  the campaign places real calls  — dialled=2 reason=2/2 dialled.
+PASS  the carrier returned a call SID  — ['CAstub000182']
+PASS  the call record is linked to the booking  — 2 linked
+PASS  the call carries the campaign brief  — Confirm {{customer}} is coming to {{appointment}}.
+PASS  a booking is not called twice for the same version  — second run dialled 0
+PASS  a booking-scoped call opens  — call_e083053830ee
+PASS  the agent looked the booking up before answering  — tools=['lookup_order', 'reschedule_appointment']
+PASS  the reschedule carries a real new time  — Checkup on Friday, November 13 at 8:00 AM
+PASS  the booking moved in the record, not just in the sentence  — outcome=rescheduled startsAt=2026-11-13T16:00:00.000Z
+PASS  the booking remembers which call moved it  — ['call_d78032e3f16f', 'call_0392f01cc0f1', 'call_c667747a7b8f', 'call_aeda45af094f', 'call_c9161868f7aa', 'call_a915089632b5', 'call_28951a83e1ca', 'call_8c5bbaba5004', 'call_94dc8b2f9164', 'call_e4b69c869932', 'call_b96332626b72', 'call_3e61f773d877', 'call_35aed54b3c7c', 'call_54a019d45ead', 'call_01d794598f79', 'call_e0127f13fc1b', 'call_876fbc94c704', 'call_254bb40f5fb2', 'call_e083053830ee']
+PASS  outcome statistics are computed  — {"total": 420, "upcoming": 10, "next24h": 1, "called": 144, "confirmed": 0, "rescheduled": 12, "cancelled": 67
+PASS  outcomes are readable for pollers  — 79 outcome(s)
+PASS  a cancellation writes the booking off  — status=cancelled
+PASS  a cancelled booking is no longer due  — []
+
+ALL BOOKING CHECKS PASS
+
+
+===== booking_check.txt =====
+PASS  the public page's API answers without a session
+PASS  no client data is in it  — booking, classes, providers, selected, services, sites, workspace
+PASS  the workspace's own terms come back  — job
+PASS  a workspace that does not exist is a 404  — That booking page does not exist.
+PASS  services are offered  — Consultation, Installation, Annual service, Checkup, Estimate, Follow-up, Site visit, Group session
+PASS  services carry what the page needs to show  — 8 service(s)
+PASS  availability answers for a chosen service  — 2 day(s) with room
+PASS  slots are grouped by local day and carry a display time  — 60 slot(s)
+PASS  availability leaks nothing about other appointments  — days, policy, scanned, service, timezone, total
+PASS  availability is rate limited per connection  — 429 on call 60
+PASS  a day the practice is closed is not offered  — every day scanned has room
+PASS  a stranger can book with no session and no key  — 201 
+PASS  the reply carries a reference and a spoken-style time  — WEB-095dd5-MW5L4N3Y · Monday 9 November at 10:00am
+PASS  the provider is named even when the visitor did not pick one  — Priya Raman
+PASS  booking the same slot twice is a 409  — 409 That time was taken while you were filling the form. Pick another slot and it will go through.
+PASS  the .ics downloads  — text/calendar; charset=utf-8
+PASS  it is a well-formed calendar with the right instant  — DTSTART:20261109T150000Z
+PASS  the file names nobody's number  — no number in the file
+PASS  it ends with CRLF as the format requires  — 'AR\r\n'
+PASS  the confirmation reports what happened to it  — pending
+PASS  a ticked box means consent was recorded, so it is not blocked  — no reason given
+  note  using signed Twilio stub line +14155550999
+PASS  running the queue sends the confirmation  — 200 {"sent": 6, "blocked": 0, "failed": 0, "stillPending": 0, "messages": [{"id": "msg_23317d8b380a1668", "status": "sent",  after 1 send(s)
+PASS  the confirmation row says it was sent, by whom, and when  — sent via twilio (after 1 send(s))
+PASS  the reminder rule can be run and reports what it queued  — 200 {"queued": 0, "pendingReminders": 0, "leadMinutes": 1440}
+PASS  running it twice queues nothing extra  — second run queued 0
+PASS  the appointment is on the workspace's books  — 200
+PASS  it carries the source the reports will use  — online
+PASS  it is attached to a client record  — cli_wc9g276olo
+PASS  the record has the visitor's consent, exactly as ticked  — sms=True email=False
+PASS  the record says it came from the booking page  — online
+PASS  withdrawn consent stops the desk texting too  — 409 Probe Web Booker 4226 has opted out of sms.
+PASS  it appears on the diary for that day  — 9 block(s) that day
+PASS  the block knows the client and the site  — Probe Web Booker 4226 at Northwind East — New York
+PASS  the workspace view shows the link and the switches  — /book/northwind-labs
+PASS  the message queue is tallied  — {"pending": 0, "sent": 488, "blocked": 0, "failed": 93, "cancelled": 475}
+PASS  switching booking off closes the page  — Online booking is switched off for this workspace. Please call instead.
+PASS  and a booking attempt is refused with 403, not a validation error  — 403 Online booking is switched off for this workspace. Please call instead.
+PASS  the Twilio fixture gives back everything it created
+
+ALL PASS — a stranger books end to end, it lands on the diary, and the confirmation is a real message.
+
+
+===== booking_status_regression_check.txt =====
+PASS  owner signs in
+PASS  an active practitioner and service exist — Dana Whitfield · Annual service
+PASS  two non-overlapping live slots exist — 200 offered
+PASS  a blocker occupies the first live slot — HTTP 201
+PASS  the upsert target occupies the second live slot — HTTP 201 · confirmed
+PASS  omitted confirmed status cannot authorize checkConflicts false — HTTP 400 · `checkConflicts: false` is allowed only for past completed, cancelled, or no-show history.
+PASS  omitted status still runs conflicts through the persisted provider — HTTP 409 · That slot is not free.
+PASS  a refused upsert leaves status and start untouched — confirmed · 2026-11-09T22:30:00.000Z
+PASS  the target can enter the cancelled terminal state — HTTP 200 · cancelled
+PASS  omitted status preserves cancelled on a later upsert — HTTP 200 · cancelled · 2026-11-09T18:30:00.000Z
+
+cleanup: both probe appointments are cancelled
+
+10 PASS / 0 FAIL
+
+
+===== manage_check.txt =====
+  note  using signed Twilio stub line +14155550999
+
+D1 — the diary keeps one clock
+  PASS  the all-sites clock is the practice's own
+  PASS  a filtered diary keeps that site's clock
+  PASS  the workspace offers a slot to test with
+  PASS  a probe appointment exists
+  PASS  a row's drawn position reconstructs its real instant
+  PASS  a time the engine offers is accepted as a drop
+  PASS  the appointment is drawn where the drop landed
+  PASS  and the stored instant is the one the drop meant
+  PASS  the site's own view agrees about the instant
+
+A1 — the client's own link
+  PASS  a probe appointment exists
+  PASS  the client's own link goes out in a message about this appointment
+  PASS  the page opens with no session
+  PASS  the page is not indexable
+  PASS  the link answers with that one appointment
+  PASS  the link knows the clinic's own clock
+  PASS  it offers real openings
+  PASS  a tampered token is refused
+  PASS  the link offers the appointment as a calendar file
+  PASS  the calendar file downloads
+  PASS  and it is not a web page in disguise
+  PASS  it describes this appointment's own instant
+  PASS  and never a cancelled ghost
+  PASS  an offered slot names who is free at it
+  PASS  the client can move their own appointment
+  PASS  and the desk's diary says the same instant
+  PASS  the move is on the record, not silent
+  PASS  the client can cancel from the link
+  PASS  the appointment really is cancelled
+  PASS  a second cancel is refused, not repeated
+
+D2 — a reply does what the text promised
+  PASS  the workspace has an active carrier-backed number to text
+  PASS  a pending appointment to confirm
+  PASS  a forged confirmation reply is rejected
+  PASS  the signed reply is answered, not swallowed
+  PASS  and it says which appointment
+  PASS  the appointment is confirmed in the diary
+  PASS  a change request is never auto-booked
+  PASS  it lands in the desk's queue
+  PASS  the desk can tick it off
+
+38 passed, 0 failed
+
+
+===== day_check.txt =====
+PASS  sign in as the owner  — session cookie
+PASS  the site's clock is known and services have durations  — Northwind East — New York · America/New_York · shortest service 30 min
+PASS  a practitioner record can be created to run a day for  — 201 
+PASS  a room of its own, so no seeded booking can collide with it  — 201 
+PASS  the rota covers yesterday, today and the future probe date  — 3 window(s) · probe 2026-11-11
+PASS  a login can be created for the practitioner  — 201 
+PASS  the practitioner can sign in as themselves  — 200
+PASS  a client with a record to flag  — 201 
+PASS  the client carries a medical flag  — 201
+PASS  an unlinked login is told it has no practitioner record  — linked=False
+PASS  …and is shown no diary at all  — 0 row(s)
+PASS  …and is offered the records it could claim  — 4 candidate(s), canLink=True
+PASS  a non-owner cannot attach a record to somebody else  — 403 Only an owner or admin can attach a practitioner record to somebody else. Ask an
+PASS  a practitioner can claim their own record  — 200 
+PASS  the answer already contains the day that now exists  — 1 row(s)
+PASS  a record already held by another login is refused by name  — 409 Probe Day View is already linked to day-probe@northwind.dev. Unlink th
+PASS  yesterday's rota is read, and only yesterday's  — 09:00–11:00 (rota)
+PASS  a stretch that has gone by is history, not an opportunity  — 1 gap(s), all past
+PASS  …and yesterday's free time is counted as gone, not as free today  — free 0 · gone by 120
+PASS  the hints come with the day, not from a second call  — notice 120 min · 6 statuses
+PASS  a stretch the notice window runs past is 'too soon', with how far past  — 18:13–18:43 → too_soon short by 85 min
+PASS  every room at the site is held for the probe half-hour  — 2 of 2 room(s) held
+PASS  an appointment can be booked into the probe practitioner's day  — 201 
+PASS  the day reads back the appointments in running order  — 10:00 AM, 10:45 AM
+PASS  a visit booked without naming a room is given a free one at that hour  — auto-assigned Probe Day Room
+PASS  each appointment carries the room, the service and the number to ring  — Probe Day Room · Probe visit · +141555706485
+PASS  each appointment says what it may move to next  — arrived, completed, cancelled, no_show, pending
+PASS  a medical flag travels with the appointment  — ['Probe anticoagulants']
+PASS  reading a flag is written to that record's own access log  — 1 day-view entr(y/ies), actor day-probe@northwind.dev
+PASS  the gap between two visits is measured, not rounded away  — 15 min
+PASS  a stretch too short for the shortest service is 'too short', with how short  — short by 15 min against a 30-minute shortest service
+PASS  a stretch long enough, on a day with notice to spare, is bookable as it stands  — 11:15 AM–12:00 PM → 45 min from 11:15 AM
+PASS  a visit left without a room is called out on the day  — 1 conflict(s): no_room
+PASS  the practitioner can move their own appointment on  — 200 
+PASS  the day shows who has arrived, and counts them  — status arrived · waitingNow 1
+PASS  the same row looks the same through the bookings API the desk uses  — visible as arrived on /api/v1/bookings
+PASS  the next step offered is the one the diary allows, and no other  — completed, cancelled, no_show
+PASS  a move the diary does not allow is refused  — 409 An appointment that is `arrived` cannot become `pending`. Allowed: com
+PASS  a status that does not exist is refused with the list  — 400 `status` must be one of: pending, confirmed, arrived, completed, cance
+PASS  completing one leaves the time booked and the count honest  — completed 1 · remaining 1
+PASS  the 15-minute gap is still too short after a completed visit  — completing does not free the time — it records what happened in it
+PASS  cancelling is the practitioner's to do too  — 200 
+PASS  the freed slot goes to the wait-list machinery rather than silently  — offers {"offered": 0, "alreadyOffered": 0, "skipped": 0, "names": [
+PASS  the freed half-hour re-joins the gap beside it and the tail into one stretch  — 10:30 AM–12:00 PM (90 min)
+PASS  the cancelled visit is still on the day, not deleted from it  — 1 cancelled
+PASS  somebody who works at two sites has a row for each of them  — Marcus Ito: 2 row(s) for 2 site(s)
+PASS  no site appears twice, and every row carries the site's own clock  — Northwind East — New York=America/New_York, Northwind HQ — San Francisco=America/Los_Angeles
+PASS  and the totals count the days, not the dates  — days=2
+PASS  a practitioner cannot read a colleague's day  — 403 That is another practitioner's day. Owners and admins can look at anyb
+PASS  an owner can read anybody's day, and the answer says so  — 200 · Dana Whitfield
+PASS  …and the picker's shortlist is offered, not hidden  — 4 practitioner(s) · canPick=False
+PASS  an unknown query parameter is refused, naming the known ones  — 400 Unknown query parameter `nonsense`. This route accepts: date, days, locationId, 
+PASS  a range wider than a week is refused  — 400 `days` must be a whole number from 1 to 7.
+PASS  a date that is not a date is refused  — 400 `date` must be a local calendar date, `YYYY-MM-DD`.
+PASS  three days come back as three days, one row per site each  — 3 row(s)
+PASS  the week strip travels with the day, for navigation without a second call  — 3 day(s)
+PASS  an API key has no day of its own, and is told why  — 400 An API key has no practitioner identity. Pass `providerId=` to read that practit
+PASS  …but it can read a named practitioner's day  — 200 · Probe Day View
+PASS  linking a login to a practitioner is audited  — 1 entry(ies) — Probe Day View ↔ day-probe@northwind.dev
+PASS  unlinking says which record it let go of  — 200 {"id": "", "name": "Probe Day View"}
+PASS  and the day empties again rather than showing a stale one  — linked=False
+PASS  unlinking twice is not an error, and is honest about it  — 200
+
+ALL PASS — a practitioner's login finds their own diary, reads it from their rota rather than the desk's board, tells free time apart from bookable time down to the notice window, moves visits on and gives the freed slot to the wait list.
+
+
+===== mirror_check.txt =====
+PASS  server-owned resources hydrate through native APIs, not the generic bridge  — none
+PASS  only persisted workspace notices use the generic row mirror  — notifications
+PASS  no unwired singleton preference is mirrored  — none
+PASS  the server accepts `notifications`  — 200 · 6 row(s)
+PASS  collection hydration requires authentication  — HTTP 401
+PASS  an unknown collection is refused  — 404 {'type': 'not_found_error', 'code': 'NOT
+PASS  the notice row lane accepts the client write shape  — 200 {"collection": "notifications", "written": 0, "mode": "append"}
+PASS  an empty append deletes nothing  — 6 before, 6 after
+PASS  read-only hydration is excluded from the mirror writer
+PASS  no server-owned slice is generically mirrored
+PASS  retired demo slices add no global dashboard requests  — none
+
+ALL PASS — 11 check(s); 0 read-only and 1 mirrored collection(s).
+
+
+===== waitlist_check.txt =====
+freed-slot and check-in check against http://127.0.0.1:3000
+PASS  the owner can sign in  — status 200
+PASS  the workspace has a practitioner, a service and a site  — Dana Whitfield · Annual service · Northwind HQ — San Francisco
+PASS  the diary offers slots to work with  — 40 openings
+
+1. the desk offers the next opening that fits somebody
+PASS  a wait-list entry can be created for a day
+PASS  the desk can offer the next opening for that window
+PASS  the offer says which time it picked  — Monday 9 November at 10:30am
+PASS  it names who it went to  — ['Probe Waiting A 1794006498']
+PASS  the offer is on the desk's board as open  — {'createdAt': '2026-11-06T23:08:18.706Z', 'id': 'wo_9e0d3d4a8326772e', 'orgId': 'org_3b5dd38bbd095dd5', 'entryId': 'wl_s
+PASS  the board speaks the time in the clinic's own words  — Monday 9 November at 10:30am
+PASS  and says when the offer stops standing  — 7:08pm today
+PASS  the offer was texted to the client  — {'createdAt': '2026-11-06T23:08:18.709Z', 'id': 'msg_847a71207dc9967d', 'orgId': 'org_3b5dd38bbd095d
+PASS  the text carries the client's own link  — Hi Probe — a job has just opened up: Monday 9 November at 10:30am with Dana Whitfield at Northwind HQ — San Fr
+PASS  the message is filed as a freed-slot offer  — waitlist_offer
+PASS  the wait entry now reads as offered  — offered
+
+2. the client opens their link
+PASS  the link answers with the offer  — status 200
+PASS  it is addressed to the person it was sent to  — Probe vs Probe
+PASS  it names the practice and their number  — {'name': 'Northwind Labs', 'phone': '+1 415 555 0188'}
+PASS  the offered time is the one the desk's board shows  — Monday 9 November at 10:30am vs Monday 9 November at 10:30am
+PASS  the page itself renders  — status 200
+PASS  a made-up token is refused  — status 404
+PASS  one tap books the appointment  — status 201 You are booked — reference wl-9e0d3d4a. A confirmation is on its way.
+PASS  the client is given a reference  — wl-9e0d3d4a
+PASS  the appointment exists on the desk's diary  — {"object": "list", "data": [{"createdAt": "2026-11-06T23:08:18.820Z", "id": "bkg_b5a522f960e60b16", "orgId": "org_3b5dd3
+PASS  the same link cannot be used twice  — status 409 You already have this one — check your messages for the conf
+PASS  and the link now says it is taken  — claimed
+PASS  with a way into the appointment  — https://pilot.example.test/m/b5a522f960e60b16.vZIsWdkWbVWp3s
+PASS  the wait-list entry reads as booked  — booked
+PASS  the claim is on the audit trail  — audit
+
+3. a cancellation offers the time it freed
+PASS  a probe appointment exists to cancel  — {"createdAt": "2026-11-06T23:08:18.935Z", "id": "bkg_505b23fb4a8c6e14", "orgId": "org_3b5dd38bbd095dd5", "exte
+PASS  somebody is waiting for that very day
+PASS  cancelling the appointment is accepted  — status 200 
+PASS  the desk is told who was offered the freed time  — {"offered": 1, "alreadyOffered": 0, "skipped": 0, "names": ["Probe Waiting B 1794006498"]}
+PASS  and that person is the one waiting  — ['Probe Waiting B 1794006498']
+PASS  the freed slot is on the desk's board as an open offer  — {'createdAt': '2026-11-06T23:08:18.962Z', 'id': 'wo_31060971dc4273b1', 'orgId': 'org_3b5dd38bbd095dd5', 'entry
+PASS  the offer is for the time the cancellation freed  — 2026-11-09T21:15:00.000Z vs 2026-11-09T21:15:00.000Z
+PASS  the freed slot is no longer standing on the diary  — cancelled
+PASS  the text carries a link for the freed slot  — wo_31060971dc4273b1.9gLRj51LvPSy5I0oo7JS
+PASS  the freed slot's page says the same time as the desk  — Monday 9 November at 1:15pm vs Monday 9 November at 1:15pm
+PASS  the first to take it gets it  — status 201 You are booked — reference wl-31060971. A confirmation is on its way.
+PASS  the appointment lands at the time that was freed  — wl-31060971
+PASS  and it is the appointment the client was offered  — 2026-11-09T21:15:00.000Z vs 2026-11-09T21:15:00.000Z
+PASS  the appointment's door is recorded as the wait list  — waitlist
+
+4. what it refuses, and says why
+PASS  a second probe appointment exists to cancel  — {"createdAt": "2026-11-06T23:08:19.055Z", "id": "bkg_5b7323c694566c37", "orgId": "org_3b5dd38bbd095dd5", "externalId": "
+PASS  a second waiter gets an offer on a second freed slot  — {'createdAt': '2026-11-06T23:08:19.078Z', 'id': 'wo_60652d3f2e3829ed', 'orgId': 'org_3b5dd38bbd095dd5', 'entry
+PASS  somebody else can book the slot the offer named  — {"createdAt": "2026-11-06T23:08:19.106Z", "id": "bkg_c7d5ee60a80fdcae", "orgId": "org_3b5dd38bbd095d
+PASS  claiming a slot that has since gone is refused  — status 409 That time has just been taken. Here are the next openings — or call the practice
+PASS  the refusal says it was taken, not that the link is broken  — That time has just been taken. Here are the next openings — or call the practice and they 
+PASS  the page offers the live openings instead  — 1 day(s) for {'providerId': 'prv_7fd7391e1243f9d6', 'serviceId': 'svc_f6bd27128651934e', 'locationId': 'loc_eeab0874c9532f8a', 'startsAt': '2026-11-09T23:30:00.000Z'}
+PASS  the alternatives are real times, in the clinic's words  — {'at': '2026-11-10T17:00:00.000Z', 'clock': '9:00am', 'with': 'Dana Whitfield', 'differentPerson': False}
+PASS  picking a different opening books it  — status 201 You are booked — reference wl-60652d3f. A confirmation is on its way.
+PASS  and it lands on the time they picked  — 2026-11-10T17:00:00.000Z vs 2026-11-10T17:00:00.000Z
+PASS  their wait-list entry closes as booked  — booked
+PASS  the earlier offer stops standing once they are booked  — claimed
+PASS  somebody already booked is not offered another slot by accident  — status 409 {"error": {"type": "api_error", "code": "CONFLICT", "message": "Nothing free bet
+PASS  a time the practice never offered cannot be claimed  — status 409 That time has just been taken. Here are the next openings — or call th
+PASS  a client can pass on an offer  — status 200 Understood — you stay on the wait list and we will offer you
+PASS  and they go back in the queue rather than off it  — waiting
+PASS  the desk can offer again after a decline  — status 201 
+PASS  the desk can take an offer back  — status 200 Withdrawn from Probe Waiting D 1794006499. They stay on the wait list.
+PASS  the client goes back in the queue  — status
+PASS  and their link no longer works  — status 409 That offer has closed. Reply to our message, or call the pra
+
+messaging consent still has the last word
+PASS  an offer is still made to somebody who cannot be texted  — {'createdAt': '2026-11-06T23:08:19.371Z', 'id': 'wo_d687f0b952fbee39', 'orgId': 'org_3b5dd38bbd095dd
+PASS  the message is filed as blocked, not silently dropped  — blocked
+PASS  and the reason names the refusal, not a mystery  — Probe Waiting E 1794006499 has opted out of sms
+
+5. saying 'I am here' from the appointment link
+  · no opening inside the 6h check-in window today (now 2026-11-06T23:08+00:00, next opening 2026-11-10T21:30:00.000Z) — this run proves the refusal before the window opens
+PASS  a probe appointment exists for check-in  — {"createdAt": "2026-11-06T23:08:19.417Z", "id": "bkg_f64ab6672ae7e037", "orgId": "org_3b5dd38bbd095dd5", "exte
+PASS  the desk can fetch the client's link for an appointment  — status 200 
+PASS  the link the desk would read out is the client's own link  — https://pilot.example.test/m/f64ab6672ae7e037.j3WMwXpBwLyxfs
+PASS  and it answers with the same appointment  — wl-walkin-1794006499 vs wl-walkin-1794006499
+PASS  the appointment has a link the client can open  — f64ab6672ae7e037.j3WMwXpBwLyxfsrrEi1qRA
+PASS  the page offers check-in exactly when the appointment is inside the window  — canCheckIn=False, expected False, appointment 2026-11-10T21:30+00:00, now 2026-11-06T23:08+00:00
+PASS  check-in is refused before its window opens  — You can check in from 7:30am on Tuesday 10 November.
+PASS  the refusal says when it opens  — You can check in from 7:30am on Tuesday 10 November.
+PASS  and names when that is truthfully (7:30am Tuesday)  — You can check in from 7:30am on Tuesday 10 November. — opens 2026-11-10T15:30+00:00 in America/Los_Angeles
+PASS  and the API refuses it too  — status 400 You can check in from 7:30am on Tuesday 10 November.
+
+clean-up
+  cancelled 8 probe appointment(s), closed 5 probe wait entry(ies), removed 10 probe client(s)
+
+74 PASS / 0 FAIL
+
+
+===== class_check.txt =====
+classes check against http://127.0.0.1:3000
+
+PASS  the desk can put a class in the service list  — 201 
+PASS  an instructor can be put down for it  — 200 
+PASS  one seat is not a class, and the refusal says so  — 400 A class needs at least 2 seats. Probe Class Studio Hour 1794006507 is set up as a one-to-one service — give it a capacity in the service list, or pass one here.
+PASS  the desk can schedule a class session  — Tuesday 10 November at 9:00am · capacity 3
+PASS  the session carries its own clock, seats and room  — Tuesday 10 November at 9:00am · America/New_York · room=Probe Day Room
+PASS  and a room, so the class is somewhere  — Probe Day Room
+PASS  a second class cannot be put on top of it  — 409 Probe Class Studio Hour 1794006507 is on at that time.
+PASS  a private appointment cannot be booked into the class hour  — 409 That slot is not free.
+PASS  the same day is offered for an ordinary service — so the search was looking  — 27 slot(s) on 2026-11-10 from {'days': 1, 'providers': 1, 'dateFrom': '2026-11-10', 'dateTo': '2026-11-10'} scanned; no reason given
+PASS  and the class hour is missing from them, not merely absent from the whole day  — 27 slot(s), none overlapping 9:00am–10:00am
+PASS  the public page offers the class  — 4 class(es) offered
+PASS  with its seats left and no roster  — 3/3 · Marcus Ito
+PASS  a seat with no usable number is refused  — 400 That phone number does not look complete.
+PASS  join 1 of 3 takes a seat  — 201 seatsLeft=2
+PASS  join 2 of 3 takes a seat  — 201 seatsLeft=1
+PASS  join 3 of 3 takes a seat  — 201 seatsLeft=0
+PASS  the fourth is refused, in words that name the capacity  — 409 Probe Class Studio Hour 1794006507 at 9:00am is full — 3 of 3 seats taken. Ask the desk for the next one.
+PASS  pressing join twice gives the seat they have, not a second one  — 200 already=True seatsLeft=0
+PASS  the roster shows who holds the places  — 3 seat(s)
+PASS  and the session counts them  — 3/3
+PASS  a seat is a booking like any other  — 200 sessionId=ses_6d143ebeaf793453
+PASS  the client's own link knows it is a place in a class  — canCancel=True canChange=False
+PASS  a place cannot be moved out of the class from the link  — 409 This is your place in Probe Class Studio Hour 1794006507 — a place can be given up but not moved. Give it up here, or call the practice and they will find you another one.
+PASS  a place can be given up from the link  — 200 Cancelled. Thank you for letting us know.
+PASS  and the seat goes back to the class  — 2 left 1
+PASS  the desk can put a walk-in in  — 201 Probe Class Walkin 1794006507
+PASS  and take a place back again  — 200 seats=2
+PASS  the roster counts its places  — {"capacity": 3, "seats": 2, "confirmed": 2, "arrived": 0, "completed": 0, "noShow": 0, "free": 1, "attended": 0}
+PASS  the room can be marked in one tap  — 200 marked=2 arrived=2
+PASS  a place that is here can be marked done  — 200 completed
+PASS  and a second one done makes two  — 200 completed=2
+PASS  two seats done is the class hour attended once, not twice  — attended 60 minute(s) for a 60-minute class with 2 places done
+PASS  a mis-tap can be undone  — 200 confirmed
+PASS  somebody who did not come is recorded as such  — 200 noShow=1
+PASS  a booking that is not a place in this class cannot be marked here  — 404 That booking is not a place in this class.
+PASS  somebody is waiting for that service that day  — 201 wl_xcwgz7rm79
+PASS  giving a place back offers the hour to nobody  — 200 offered=0
+PASS  and the answer says why rather than leaving an empty list  — A place in a class was given back — the class keeps its hour, and nobody is waiting for a place in it.
+PASS  the desk cannot offer a class place as a slot either  — 409 That is a place in a class, not a slot — the class is still running in its room with its instructor. Give the place back and the class keeps its hour; the wait list cannot be offered it.
+PASS  nor can it hand a waiting client the class hour by hand  — 409 A class is on at that time in the diary — its room and instructor are held for a roster, so the hour is not free to offer. Offer a different time, or add them to the class roster instead.
+
+8b. a full class, and the line for a place
+PASS  a second class to fill  — Friday 13 November at 9:00am
+PASS  a class with places left refuses the line, and says how many  — 409 There are 2 places left in that class — take one instead of waiting for it.
+PASS  and it fills  — seatsLeft=0
+PASS  somebody can wait for a place in a full class  — 201 position=1
+PASS  pressing twice keeps the place in line they have  — 200 already=True
+PASS  the next person is second in line  — 201 position=2
+PASS  the desk sees the line, in the order they joined  — ['Probe Queue First 1794006507', 'Probe Queue Second 1794006507']
+PASS  a class entry is never offered a private time by hand  — 409 That person is waiting for a place in a class, not for a time. Give a seat back in that class and they will be offered it — or put them straight on its roster.
+PASS  a place given back is offered to the front of the line  — 200 offered=1
+PASS  and the offer is against that person, not the whole line  — ['offered', 'waiting']
+PASS  the person at the front is texted a link  — Hi Probe — a place in Probe Class Studio Hour 1794006507 on Friday 13 November at 9:00am has just come free. T
+PASS  and the text names a place, not a time  — Hi Probe — a place in Probe Class Studio Hour 1794006507 on Friday 13 November at 9:00am has just come free. T
+PASS  the claim page says it is a place in a class  — 200 kind=class
+PASS  taking it puts them in the class  — 201 CLS-b34ab9-MW5L5LDG-9B1B
+PASS  the roster has the person who was waiting  — ['Probe Queue First 1794006507', 'Probe Queue Seat 2 1794006507']
+PASS  and the line moves up  — [(1, 'Probe Queue Second 1794006507')]
+PASS  cancelling the class closes its line  — 200 queueClosed=1
+PASS  and the entry is closed, not left waiting  — cancelled
+PASS  the person still in line is told the class is off  — Probe Queue Second 1794006507 — Probe Class Studio Hour 1794006507 on Friday 13 November at 9:00am has been ca
+PASS  the diary draws the class once  — 1 block(s)
+PASS  with its places counted, and not as appointments  — seats=2 · appointments=0
+PASS  the desk's board shows it with its count  — 2/3
+PASS  a stranger cannot read the class list
+PASS  a stranger cannot schedule one either
+PASS  the desk can cancel the whole session  — 200 released=2
+PASS  every place is released  — 2
+PASS  the roster empties  — 0 left
+PASS  a class that was called off has no register — a released place cannot be resurrected by marking it  — 409 That class was called off — its places are gone, so there is no register to mark.
+PASS  the people holding places are told  — 2/2 texted · 4 message(s)
+PASS  the queue grew by the messages it sent  — 2 → 4 about this class
+PASS  in one sentence, with the start time said once  — Probe Class Attendee 2 1794006507 — Probe Class Studio Hour 1794006507 on Tuesday 10 November at 9:00am has been cancell
+PASS  it leaves the public page
+PASS  and nobody can join it  — 409 That class session has been cancelled.
+PASS  the board drops it too
+
+clean-up
+  instructor's services put back  — status 200
+  removed the probe service  — status 200
+  anything left is named `Probe Class …`; `npx tsx scripts/tidy-probe-orgs.ts` sweeps it
+
+ALL PASS — 74 checks: a class holds its hour, sells exactly its seats, gives one back when somebody leaves, hands a given-back place to the front of its own line, and empties cleanly when it is called off.
+
+
+===== messaging_check.txt =====
+  note  using signed Twilio stub line +14155550999
+PASS  the template list answers
+PASS  every job has wording: confirmation, reminder, follow-up, no-show, win-back, recall  — class_offer, confirmation, followup, no_show, overdue, recall, receipt, refund, reminder, waitlist_offer, winback
+PASS  templates come in the workspace's own vocabulary  — job
+PASS  merge fields are listed with samples  — 20 fields
+PASS  the preview context is filled from this workspace's own diary  — Devin · Saturday 7 November at 12:07am
+PASS  a preview fills the merge fields  — Hi Devin, see you Saturday 7 November at 12:07am.
+PASS  the preview names the unknown fields instead of hiding them
+PASS  a typo is left visible and reported  — ['client_firstname', 'docotr']
+PASS  the reminder template exists and carries no placeholder for the opt-out line
+PASS  saving the wording works
+PASS  the API says the opt-out line is the sender's job, not the template's  — Every text that does not already offer a way out gets "Reply STOP to opt out." a
+PASS  a template can be retired
+PASS  a retired template is not in the live list
+PASS  but it is kept, wording and all  — 18 rows
+PASS  and can be restored
+PASS  ?kind=recall answers with the recall wording and nothing else  — 2 of 18 row(s), kinds=['recall']
+PASS  and ?channel=sms narrows it again, without contradicting it  — 1 row(s)
+PASS  neither of them is the whole drawer  — 2 < 18
+PASS  a kind that does not exist is refused rather than ignored  — 400 {"error": {"type": "invalid_request_error", "code": "VALIDATION_ERROR", "message": "No template kind
+PASS  reset writes the house default as a fresh row
+PASS  the house default is the live reminder again  — Reminder
+PASS  a probe appointment exists to remind about
+PASS  the reminder rule queues at T-minus N  — {"queued": 1, "pendingReminders": 1, "leadMinutes": 1440}
+PASS  running the rule again queues nothing extra  — {"queued": 0, "pendingReminders": 1, "leadMinutes": 1440}
+PASS  **a reminder is queued for T-minus N**  — 2026-11-07T05:08:38.196Z — T-minus 24.0h
+PASS  and it is not scheduled to arrive outside the quiet hours  — 0:00 in America/New_York
+PASS  and it waits: it is pending, not sent  — pending
+PASS  an appointment that moves re-times its queued reminder  — 2026-11-07T10:08:38.196Z — 1 queued
+PASS  an appointment beyond the horizon is left alone for now  — 0 message(s)
+PASS  the reminder is a real queue row, once  — 1 row(s)
+PASS  an appointment already inside the lead gets its reminder at once  — 2026-11-06T23:08:38.176Z
+PASS  it is never retroactive  — 2026-11-06T23:08:38.176Z
+PASS  it names the appointment it belongs to
+PASS  the body is the workspace's wording, not a stock line  — Hi Probe — a reminder: your job is Friday 6 November at 9:08pm with  at . Reply C to confi
+PASS  the opt-out line is on the text  — jt7RYLVcaNpd6aHka Reply STOP to opt out.
+PASS  delivery runs the queue
+PASS  the reminder actually went  — {"id": "msg_b1b5543088426272", "status": "sent", "channel": "sms", "to": "+15556518162"}
+PASS  the row carries a carrier and a message id, not just a status  — twilio · SMstub000217
+PASS  the send is logged in `outreach`  — 1 row(s): sms/reminder/sent
+PASS  the log row says what it was, who it went to and which message it was  — reminder → +15556518162
+PASS  it records who caused it  — reminder-rule
+PASS  the carrier received the text, with the opt-out line on it  — 33 message(s) at the stub
+PASS  a forged delivery receipt is rejected  — 403 invalid carrier signature
+PASS  the carrier's signed delivery receipt is accepted and matched to the message  — {"ok": true, "messageId": "msg_b1b5543088426272", "status": "sent", "recorded": "delivered"}
+PASS  and it refines the log row rather than adding one  — delivered
+PASS  the recall rule can be switched off for the check  — 200
+PASS  and it reads back as off  — {"enabled": false, "afterDays": 180, "channels": ["sms"], "cooldownDays": 90, "maxPerDay":
+PASS  a person at the desk can still text while the automation is off  — 201 pending {'id': 'msg_14205794a063a53a', 'channel': 'sms', 'to': '+15556518488', 'status': 'pending', 'sendAt': '2026-
+PASS  and the row says who sent it  — desk:desk@northwind.dev
+PASS  and it is filed as a person's message, not as the automation  — manual
+PASS  the rule is put back as it was found  — 200
+PASS  email is sent through the relay, not the carrier  — sent via email
+PASS  the relay received it  — 5 email(s) at the relay
+PASS  a withdrawn consent refuses the reminder at queue time  — Probe NoConsent 18539 has opted out of sms
+PASS  the refusal is logged as outreach too  — reminder/blocked
+PASS  a forged inbound text is rejected  — 403 
+PASS  a signed inbound text is accepted  — <?xml version="1.0" encoding="UTF-8"?><Response></Response>
+PASS  **replying STOP withdraws consent, with the reply as the evidence**  — {"granted": false, "source": "inbound-sms", "at": "2026-11-06T23:08:38.614Z", "note": "Replied \"STOP\" to +14
+PASS  and the reminder that would have gone is refused  — blocked
+PASS  the reply itself is in the log  — sms/blocked, sms/opted_out
+PASS  START gives it back  — {"granted": true, "source": "inbound-sms", "at": "2026-11-06T23:08:38.685Z", "no
+PASS  a reminder that comes due in quiet hours waits for the window  — sendAt 2026-11-07T06:00:38.776Z (412 min away)
+PASS  the scheduler ticks  — ["\u2713 deliver-messages: 0 sent, 0 blocked, 0 failed", "\u2713 no-show-followups: 1 queued", "\u2713 visit-followups: nothing to follow up
+PASS  the follow-up job runs  — nothing to follow up
+PASS  a missed appointment draws a follow-up text  — pending
+PASS  an attended one does not  — 0 message(s)
+PASS  the follow-up that went is counted in the report  — 0 → 1
+PASS  **the no-show rate is reportable**  — 9 missed of 208 = 4.3%
+PASS  the rate is the arithmetic it claims to be  — 0.04326923076923077
+PASS  the report compares with the period before it  — previous: None
+PASS  the report breaks the rate down rather than asserting it  — 4 provider rows
+PASS  the report lists what nobody settled  — 25 unsettled
+PASS  cancellations are counted apart from no-shows  — 199 attended · 9 missed · 70 cancelled
+PASS  the window is honoured  — 2026-11-05T23:08:39.125Z vs 2026-08-08T23:08:39.098Z
+PASS  a booking made on the web logs its confirmation in the same place  — sent
+PASS  the scheduler lists the jobs that make the product move  — campaign-tick, deliver-messages, no-show-followups, overdue-chase, queue-reminders, recalls, retention, visit-followups
+PASS  every job says when it runs and what happened last time  — 8 jobs
+PASS  a job can be run on demand  — nothing due
+PASS  running it updates what the dashboard shows  — runs 525 → 526 · nothing due
+PASS  two ticks in a row queue nothing extra — every job is idempotent  — 1 → 1 pending
+PASS  a paused job does not run  — This job is paused.
+PASS  but an operator can insist, once  — nothing to follow up
+PASS  a campaign can be created with texts and no calls
+PASS  its dry run says it would text, not dial  — {"ok": true, "dryRun": true, "via": "workspace", "dialled": 0, "skipped": 3, "calls": [{"bookingId": "bkg_362728a6292cc5
+PASS  a real run queues the texts  — texted 3 · dialled 0 · 3 text(s) queued.
+PASS  and dials nobody  — dialled 0
+PASS  the campaign carries both channels in its settings  — {"call": false, "sms": true}
+PASS  and counts what it texted as well as what it dialled  — {"runs": 1, "dialled": 0, "confirmed": 0, "rescheduled": 0, "cancelled": 0, "noAnswer": 0, "failed": 0, "texte
+
+ALL PASS — a reminder fires at T-minus N and is logged in outreach, and the no-show rate is reportable.
+
+
+===== carrier_check.txt =====
+PASS  login  — session cookie
+PASS  a published assistant is available  — none
+PASS  carrier stub reset  — 200 {'reset': True, 'owned': 1}
+PASS  the carrier rejects wrong credentials and they are not retained  — 400 The carrier rejected these credentials: Authentication Error - invalid username
+PASS  unsupported carrier names are refused  — 400 Only the Twilio adapter is implemented in this deployment.
+PASS  a malformed Twilio SID is refused  — 400 A Twilio account SID starts with AC and is 34 characters long.
+PASS  the Twilio account connects and verifies immediately  — 201 
+PASS  carrier secrets are masked and never returned  — AC0123••••def
+PASS  the verified carrier balance is provider evidence  — 412.38000 USD
+PASS  re-verification returns live carrier facts  — 200 
+PASS  available inventory comes from the carrier  — 15 row(s)
+PASS  the owned inventory exposes the seeded line as unadopted  — [{"sid": "PNstub000900", "number": "+14155550999", "label": "Existing line", "locality": "San Francisco", "voiceUrl": "https://old-ivr.example.com/answer", "adopted": false}]
+PASS  provider purchase rejection is surfaced  — 400 The carrier refused the purchase: Injected purchase failure
+PASS  the same number succeeds after rejection, so no stale claim remains  — 201 
+PASS  purchased callbacks use the trusted public origin  — {"voiceUrl": "https://pilot.example.test/api/telephony/twilio/voice", "statusCallback": "https://pilot.example.test/api/telephony/twilio/status"}
+PASS  an owned SID/number mismatch is refused  — 400 That SID and number are not a matching number on this carrier account.
+PASS  provider webhook rejection leaves adoption uncommitted  — 400 The carrier refused to re-point the number: Injected configure failure
+PASS  failed adoption created no local claim
+PASS  the owned line adopts after the failed attempt  — 201 
+PASS  a duplicate claim is refused before rewiring  — 409 That phone number is already claimed by a workspace on this deployment.
+PASS  direct local deletion of a carrier number is refused  — 400 Carrier-backed numbers must use the release action so the carrier result is checked before local removal.
+PASS  disconnect is blocked while numbers remain linked  — 409 This carrier still has 2 workspace number(s). Release or detach them before disconnecting.
+PASS  the second tenant verifies through the real code flow  — 200 
+PASS  a second tenant can connect its own credential record  — 201 
+PASS  a second tenant cannot claim the first tenant's active E.164 line  — 409 That phone number is already claimed by a workspace on this deployment.
+PASS  an outbound call reaches the carrier  — 201 
+PASS  the carrier returns a call SID  — {"createdAt": "2026-11-06T23:08:47.833Z", "id": "call_058dd794e9e7", "orgId": "org_3b5dd38bbd095dd5", "assistantId": "asst_e49a910501", "assistantName": "Suppor
+PASS  a forged inbound voice callback is rejected  — 403
+PASS  forwarded host headers cannot redefine the signed callback URL  — 403
+PASS  the same callback signed for the trusted origin is accepted  — 200 <?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Gather input="speech" speechTimeout="auto" spee
+PASS  a forged gather turn is rejected  — 403
+PASS  a signed gather turn runs the shared agent  — 200 <?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Gather input="speech" speechTimeout="auto" spee
+PASS  a forged media-stream callback is rejected  — 403
+PASS  a signed media-stream callback returns carrier XML  — 200 <?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Connect>
+    <Stream url="wss://pilot.example.t
+PASS  a forged terminal status is rejected  — 403
+PASS  a signed terminal status closes the mapped call  — 200 {'ok': True, 'callId': 'call_9546189fc52e', 'status': 'ended'}
+PASS  a provider detach failure is surfaced  — 400 The carrier would not detach this deployment's routing: Injected configure failure
+PASS  failed detach keeps the local claim
+PASS  detach retry restores previous routing and removes only the workspace claim  — 200 {'id': 'num_a6505d21a76100ab', 'number': '+14155550999', 'releasedAtCarrier': False, 'carrier': {'attempted': True, 'released': False, 'detached': True, 'restoredPrevious': True}, 'note': 'Detached from this workspace and restored to its previous carrier routing. The number remains on your carrier account.'}
+PASS  a provider release failure is surfaced  — 400 The carrier would not release this number: Injected release failure
+PASS  failed release keeps the local billing claim
+PASS  release retry succeeds provider-first  — 200 {'id': 'num_af5babf1c6b234c3', 'number': '+14155550301', 'releasedAtCarrier': True, 'carrier': {'attempted': True, 'released': True}, 'note': 'The carrier reported that the number was released. Confirm final rental charges in the carrier account.'}
+PASS  detaching the adopted line restored its pre-Voxera voice route  — {"sid": "PNstub000900", "phone_number": "+14155550999", "friendly_name": "Existing line", "status": "in-use", "monthly_cost": "1.15", "date_created": "2025-11-02T00:00:00Z", "locality": "San Francisco", "region": "CA", "iso_country": "US", "capabilities": {"voice": true, "sms": true, "mms": true}, "voice_url": "https://old-ivr.example.com/answer"}
+PASS  the released purchase is gone at the carrier  — [{"sid": "PNstub000900", "phone_number": "+14155550999", "friendly_name": "Existing line", "status": "in-use", "monthly_cost": "1.15", "date_created": "2025-11-02T00:00:00Z", "locality": "San Francisco", "region": "CA", "iso_country": "US", "capabilities": {"voice": true, "sms": true, "mms": true}, "voice_url": "https://old-ivr.example.com/answer"}]
+PASS  the carrier disconnects only after every linked number is reconciled  — 200 
+PASS  the second tenant's unused credential row disconnects cleanly  — 200 
+
+ALL CARRIER CHECKS PASS
+
+
+===== ai_check.txt =====
+PASS  login  — session cookie
+PASS  a wrong key is refused  — status 401 Incorrect API key provided
+PASS  a refused key is not stored  — 0 credentials
+PASS  key connected and verified  — status 201 
+PASS  provider confirmed the key  — Claude is reachable — 3 models visible.
+PASS  key is stored masked  — stub••••-key
+PASS  re-verify works  — status 200 
+PASS  models endpoint reports the engine  — engine=model
+PASS  anthropic is ready with a workspace key  — ready=True
+PASS  catalogue never presents unavailable provider prices as facts  — 0/12 priced
+PASS  a booking assistant exists  — Appointment desk
+PASS  assistant pinned to a Claude model  — status 200 
+PASS  call opened  — call_2f89a0233aa5
+PASS  engine is the model, not the rules  — engine=anthropic model=Claude Sonnet 4.5
+PASS  the model called a booking tool  — tools=['reschedule_appointment']
+PASS  the tool result came back to the caller  — Appointment on Thursday, November 12 at 2:00 PM
+PASS  tokens are counted  — in=240 out=40
+PASS  cost follows available attribution instead of inventing a charge  — $0 · pricingAvailable=False
+PASS  a second tool call in the same call  — tools=['cancel_appointment']
+PASS  the transcript is a real conversation  — 5 turns
+PASS  the call stayed in progress  — in-progress
+PASS  phone path reports its providers  — transcriber=simulated
+PASS  provider stub is live  — 3 models
+PASS  an endpoint that rejects us is refused, with its words  — status 401 {"error": {"type": "api_error", "code": "UNAUTHORIZED", "message": "The endpoint rejected the credentials: x-v
+PASS  an endpoint without a URL is refused  — status 400 {"error": {"type": "invalid_request_error", "code": "VALIDATION_ERROR", "message": "A base
+PASS  a URL that is not a URL is refused, with advice  — status 400 {"error": {"type": "invalid_request_error", "code": "VALIDATION_ERROR", "message": "\"ai.northwind.dev\" is no
+PASS  their endpoint is accepted once it answers  — status 201 {"id": "ai_org_3b5dd38bbd095dd5_custom", "provider": "custom", "providerLabel": "Your own endpoint", "label": 
+PASS  the endpoint's own models are discovered  — northwind-triage-8b, northwind-desk-70b
+PASS  their endpoint is reported as verified  — Your endpoint answered — 2 models visible (northwind-triage-8b, northwind-desk-70b).
+PASS  the header names are reported, the values never are  — names=['x-voxera-tenant', 'x-northwind-gateway-token']
+PASS  a test message really completes through it  — northwind-triage-8b in 1ms: I can help with that — could you tell me a little more about
+PASS  the customer's own model answers the call  — engine=custom modelError=None
+PASS  the turn came back with text  — No appointment is on file for this number — ask the caller for the day
+PASS  its tool calls run through the same executors  — lookup_order
+PASS  the tool ran, it was not merely offered  — {"found":false,"note":"No appointment is on file for this number — ask
+PASS  no invented price is charged for their model  — costUsd=0 from 240 real tokens
+PASS  an unknown model id routes to their endpoint unpinned  — engine=custom
+PASS  an Anthropic-shaped endpoint is accepted too  — status 201 {"id": "ai_org_3b5dd38bbd095dd5_custom", "provider": "custom", "providerLabel": "Your own endpoint",
+PASS  and a test message completes over Messages  — I can help with that — could you tell me a little more about what you 
+PASS  the workspace is left as it was found  — model=gpt-4o-mini
+
+ALL AI CHECKS PASS
+
+
+===== money_check.txt =====
+PASS  the workspace bootstraps the money layer  — status 200 · 0 ledger row(s) seeded · 0 payment type(s)
+PASS  the practice has money settings  — {"currency": "USD", "invoicePrefix": "INV", "termsDays": 0, "taxMode": "exclusive"}
+PASS  the counter has payment types  — Account credit, Bank transfer, Card, Cash, Direct debit
+PASS  the payment driver is reported, with its reason  — sandbox — no payment provider is configured — links take sandbox payments
+PASS  no provider is configured, so the sandbox is the driver  — driver is sandbox (a Stripe key would make it stripe — that is fine, but this gate runs keyless)
+PASS  a probe visit exists to bill  — bkg_feda9566aed1cfe6 · Annual service
+PASS  the visit raises an invoice  — 201 
+PASS  it is priced from the service, not typed in  — 14000 vs service price 14000 (USD minor units)
+PASS  it is a draft, and it says which visit it came from  — draft · bookingIds=['bkg_feda9566aed1cfe6']
+PASS  billing the same visit twice is refused, and says which invoice exists  — 409 Probe Money 44422 already has invoice (draft).
+PASS  a draft takes lines, quantities, tax and a discount  — 200 
+PASS  **the invoice total is exactly the sum of its lines**  — total 12874 vs lines 12874
+PASS  subtotal, discount and tax are all whole minor units  — subtotal 13005/13005 · discount 1301/1301 · tax 1170/1170
+PASS  the discount is spread across the lines, to the cent  — 1301 across lines = 1301 · exact 1300.5 of 13005 at 10%
+PASS  a discount raises no floating-point crumbs  — [{"netMinor": 9000, "discountMinor": 1000, "taxMinor": 900}, {"netMinor": 2700, "discountMinor": 300, "taxMinor": 270}, {"netMinor": 4, "discountMinor": 1, "taxMinor": 0}]
+PASS  issuing numbers it and dates it  — INV-2256 issued 2026-11-06 due 2026-11-06
+PASS  the due date follows the practice's own terms  — due 2026-11-06 after 0 day(s)
+PASS  **an issued invoice cannot be edited**  — 409 Invoice INV-2256 has been issued. An issued invoice is a document: raise a credit note for what is wrong, 
+PASS  and the refusal says what to do instead  — Invoice INV-2256 has been issued. An issued invoice is a document: raise a credit note for what is wrong, or v
+PASS  the document is untouched by the attempt  — 12874 vs 12874
+PASS  a part payment is recorded against the invoice  — 201 [{"invoiceId": "inv_f8ed5e90cd397e03", "amountMinor": 6437, "at": "2026-11-06T23:09:04.522
+PASS  the invoice now says what is left, not what was paid  — paid 6437 · balance 6437 · partly_paid
+PASS  **settling the rest leaves nothing owed, and the status says paid**  — balance 0 · paid · paid 12874/12874
+PASS  the second payment covered only what was left, not the whole invoice again  — 6437 vs 6437 remaining
+PASS  both payments are on the document  — 2 payment(s)
+PASS  each payment says how it arrived and who took it  — ["cash", "card"]
+PASS  the record keeps its own access log  — create, update, view
+PASS  the audit trail kept the issue and the payments  — booking.created, invoice.created, invoice.edited, invoice.from_booking, invoice.issued, payment.payment
+PASS  a payment larger than the balance is taken as credit on the account, not as phantom money against the invoice  — 201 — 50000 minor taken, balance None
+PASS  **a refund cannot exceed what was taken**  — 400 Only $128.74 has been paid against INV-2256 — a refund cannot exceed it.
+PASS  a refund is recorded as money out  — 201 · out 6437
+PASS  and it re-opens the balance by exactly that amount  — balance 6437 of 12874
+PASS  an invoice with money on it cannot be voided — the money is dealt with first  — 409 $64.37 has been paid against this invoice. Refund it (or credit the account) first, then void it.
+PASS  **a credit note is its own document**  — CR-0223 for -6437 (negative, as a credit note is)
+PASS  the credit note reduces what is owed, and the original keeps its number  — credited 6437 · balance 0 · INV-2256
+PASS  the credit note points back at the invoice it corrects  — inv_f8ed5e90cd397e03
+PASS  a credit note larger than what is left is refused  — 400 There is only $0.00 left on INV-2256 — a credit note cannot be for more than that.
+PASS  the client record carries their account  — due $0.00 · credit $0.00
+PASS  **the statement reconciles: the ledger's balance is the invoices' own balance**  — ledger closing 0 vs invoices owing 0 less credit 0
+PASS  the ledger lists the invoice, the payments, the refund and the credit note in order  — credit_note:-6437, invoice:12874, payment:-6437, payment:-6437, refund:6437
+PASS  the last row's running balance is the closing balance  — 0 vs 0
+PASS  a second invoice can be raised deliberately when a caller insists  — 201 
+PASS  a payment link cannot ask for more than is owed  — 400 $140.00 is what INV-2257 still owes; a link cannot ask for more.
+PASS  a payment link is created for part of the balance  — 201 
+PASS  the link points at a page a patient can open  — https://pilot.example.test/pay/ea52d86063381efc5f1a6c90
+PASS  **the payment page opens with no account at all**  — 200 
+PASS  it shows the amount, the practice and the reference — and not the patient  — {"amountFormatted": "$10.00", "practiceName": "Northwind Labs", "status": "open"}
+PASS  it says it is a sandbox, because no provider is configured  — sandbox=True provider=sandbox
+PASS  **the sandbox takes the payment with no keys configured**  — 200 
+PASS  paying the same link twice does not take the money twice  — 200 alreadyPaid=True
+PASS  the settled payment is on the invoice, once  — paid 1000 across 1 payment(s)
+PASS  the invoice's own history says it came from the payment page  — [["payment-page", "online", "settled"]]
+PASS  the link is closed as paid, with its payment attached  — {"status": "paid", "paidAt": "2026-11-06T23:09:04.722Z", "paymentId": "pay_c216b3eb1b8b3937"}
+PASS  a cancelled link refuses payment  — 409 This payment link was cancelled.
+PASS  a token that does not exist is a 404, not an empty page  — 404 That payment link does not exist.
+PASS  a link can be texted from the desk through the real message queue  — 200 sent=False reason=No carrier connected — connect one at Dashboard → Carriers t
+PASS  **the assistant can read what is owed and send a link**  — check_availability, book_appointment, transfer_call, reschedule_appointment, cancel_appointment, lookup_order, send_conf
+PASS  the agent reaches for the account, not a guess  — send_confirmation, create_payment_link, payment_status
+PASS  what it reads back is the client's real balance, in money  — {"outstanding": "$130.00", "found": true}
+PASS  a link it creates is a real link, for a real amount  — {"amountOnLink": "$130.00", "sandbox": true, "sent": true}
+PASS  the front desk can see what is owed  — 200 · 396 invoice(s)
+PASS  **a receptionist may take a payment at the counter**  — 201 
+PASS  and may not credit or void what is owed — that is the practice's books  — 403 Taking money is the desk’s job; changing what is owed is the practice owner’s.
+PASS  nor raise an invoice in the first place  — 403 Taking money is the desk’s job; changing what is owed is the practice owner’
+PASS  an expense is recorded with its category and supplier  — 201 4250 minor units
+PASS  an expense must be for a positive amount  — 400 An expense is for a positive amount.
+PASS  the overview adds up the same rows  — billed 5130174 · collected 3783624 · outstanding 1346550 · expenses 321465
+PASS  revenue is attributed to the practitioner who did the work  — Marcus Ito: 2076100, Dana Whitfield: 2023200, Priya Raman: 1027900
+PASS  nobody is credited with money the practice never took  — [[2076100, 1627950], [2023200, 1316550], [1027900, 828700]]
+PASS  **the Xero-shaped export is offered**  — 200 {"generatedAt": "2026-11-06T23:09:04.905Z", "Organisation": {"Name": "Northwind Labs", "BaseCurrency": "USD"},
+PASS  the export carries the same numbers as the ledger  — INV-2256 total 128.74 vs 128.74
+PASS  and the same contacts, so an import lands on the right client  — 66 contact(s)
+PASS  a CSV of invoices comes with it, for the bookkeeper who prefers a spreadsheet  — InvoiceNumber,ContactID,Date,DueDate,Status,SubTotal,TotalTax,Total,AmountPaid,A
+
+ALL PASS — invoice → payment → statement reconciles, and the sandbox flow settles with no keys configured.
+
+
+===== money_loop_check.txt =====
+money loop check against http://127.0.0.1:3000
+PASS  the owner can sign in  — status 200
+  note  using signed Twilio stub line +14155550999
+PASS  the practice's calendar is readable  — timezone America/New_York
+PASS  the workspace's messaging rules are readable  — tz America/New_York
+PASS  the books are readable  — USD, 0 day terms
+PASS  the desk can set the chase schedule  — {"enabled": true, "offsetsDays": [-3, 0, 7, 21], "channels": ["sms"]}
+PASS  a mistyped schedule is clamped, sorted and deduplicated  — {"enabled": true, "offsetsDays": [-60, 0, 365], "channels": ["sms"]}
+PASS  a probe client exists to bill  — {"createdAt": "2026-11-06T23:09:13.257Z", "id": "cli_i1bfxdcvsx", "orgId": "org_3b5dd38bbd095dd5", "name": "Probe Money 
+
+0. a settings change cannot break invoicing
+PASS  a settings change that omits the prefix keeps it  — {"currency": "USD", "invoicePrefix": "INV", "termsDays": 0, "defaultTaxRatePct": 0, "taxMode": "exclusive", "autoInvoiceOnComplete": false}
+PASS  and the change it did make takes effect  — terms 0
+
+1. a payment says thank you
+PASS  a probe bill exists  — INV-2258
+PASS  and a bill issued after that change is numbered as usual  — INV-2258
+PASS  the desk can make a payment link for the bill  — https://pilot.example.test/pay/9a1e4e600eabd5f772113a62
+PASS  the messaging window is open for the receipt  — {"start": 0, "end": 24}
+PASS  the desk can take part of a bill  — status 201 
+PASS  paying sends a receipt  — 1 receipt(s)
+PASS  the receipt says how much arrived  — Hi Probe — thank you, we have received $120.00 for INV-2258. $80.00 is still due on INV-2258.
+Pay what is left here: https://pilot.example.t
+PASS  and what is still owed  — Hi Probe — thank you, we have received $120.00 for INV-2258. $80.00 is still due on INV-2258.
+Pay what is left here: https://pilot.example.t
+PASS  and names the bill  — Hi Probe — thank you, we have received $120.00 for INV-2258. $80.00 is still due on INV-2258.
+Pay what is left here: https://pilot.example.t
+PASS  and it goes to the client's own number  — +141555506553 vs +141555506553
+PASS  and it reuses the link the desk already made, rather than opening another  —  left here: https://pilot.example.test/pay/9a1e4e600eabd5f772113a62 Reply STOP to opt out.
+PASS  and it actually goes  — status 200 {"run": {"name": "deliver-messages", "orgId": "org_3b5dd38bbd095dd5", "ok": true
+PASS  through the carrier, not the void  — {"provider": "twilio", "providerMessageId": "SMstub000229", "status": "sent"}
+PASS  and the messaging window is put back as it was found  — {"start": 0, "end": 24}
+PASS  the rest of the bill can be paid  — status 201 
+PASS  a second receipt goes for the second payment  — 2 receipt(s)
+PASS  and the newest receipt says the bill is settled  — Hi Probe — thank you, we have received $80.00 for INV-2258. INV-2258 is settled. Reply STOP to opt out.
+PASS  and a settled bill's receipt carries no pay link to tap  — ank you, we have received $80.00 for INV-2258. INV-2258 is settled. Reply STOP to opt out.
+
+2. and so does a payment made from the link
+PASS  a payment link can be made for the bill  — {"link": {"createdAt": "2026-11-06T23:09:13.458Z", "id": "plink_51061efbd9178d0b", "orgId": "org_3b5dd38bbd095
+PASS  the client's pay page opens with no session  — status 200
+PASS  the sandbox payment goes through  — status 200 
+PASS  money from the page earns the same receipt  — 1 receipt(s)
+PASS  and that receipt says the bill is settled too  — Hi Probe — thank you, we have received $90.00 for INV-2259. INV-2259 is settled. Reply STOP to opt out.
+PASS  and it names the bill the link was for  — Hi Probe — thank you, we have received $90.00 for INV-2259. INV-2259 is settled. Reply STOP to opt out.
+PASS  and money taken by a webhook is not a second message per payment  — 1 receipt(s) for one payment
+
+3. the schedule asks for what is owed
+PASS  the job runs on demand  — status 200 {"name": "overdue-chase", "orgId": "org_3b5dd38bbd095dd5", "ok": true, "detail": "1 queued", "ms": 5
+PASS  a bill due today is asked about on the day  — [[0, "pending"]]
+PASS  the chase names the amount  — Hi Probe — a reminder that $150.00 is still owing on INV-2260 (due Friday 6 November). Reply STOP to opt out.
+PASS  and the bill  — Hi Probe — a reminder that $150.00 is still owing on INV-2260 (due Friday 6 November). Reply STOP to opt out.
+PASS  and says when it was due  — Hi Probe — a reminder that $150.00 is still owing on INV-2260 (due Friday 6 November). Reply STOP to opt out.
+PASS  running the job twice queues nothing twice  — 1 row(s) after a second pass
+PASS  and the second pass says what it did in the practice's words  — nothing to chase
+PASS  a bill three days out gets the courtesy nudge before it falls due  — [-3]
+PASS  a bill ten days late gets the step that fits it  — [7]
+PASS  a bill a month late gets one text, not four  — [21]
+PASS  a bill ten days out is left alone until its first nudge is due  — 0 row(s)
+PASS  a chase carries the pay link when there is one  — Hi Probe — a reminder that $55.00 is still owing on INV-2265 (due Tuesday 27 October).
+Pay here: https://pilot.example.test/pay/a11ce83838f2
+PASS  and nothing is glued to the end of the link  — character after the link: ' '
+
+4. and it stops when the money arrives
+PASS  a chase is waiting for the bill to be paid  — [[7, "pending"]]
+PASS  paying in full takes the unsent chase back  — [["cancelled", "settled in full"]]
+PASS  and the record says why  — settled in full
+PASS  and a settled bill is never chased again  — 1 row(s)
+PASS  a part payment also takes back the chase that is now wrong  — [["cancelled", "part paid \u2014 $150.00 still due"]]
+PASS  saying what is still owed  — part paid — $150.00 still due
+PASS  a credit note takes back the chase too  — [["cancelled", "a credit note of $100.00 was applied"]]
+PASS  a voided bill is not chased  — [["cancelled", "the invoice was voided"]]
+
+5. consent, contact details and the hour of the day
+PASS  somebody who has opted out of texts is chased by email instead  — [["email", "pending"]]
+PASS  and the row is not blocked, because email is fine  — pending
+PASS  a client who has opted out of everything gets a blocked row, not a silence  — [["sms", "blocked"]]
+PASS  and the row names the refusal  — Probe Money 1794006553-0 has opted out of sms
+PASS  a chase due outside quiet hours waits for the window  — queued for 2026-11-07T00:00:15.122Z (now 2026-11-06T23:09+00:00)
+PASS  and it waits until the window opens, in the practice's own clock  — waits to 19:00, window opens 19:00
+
+6. and the desk can see all of it
+PASS  the invoice screen knows the schedule  — [-3, 0, 7, 21]
+PASS  and says what has gone and what is next  — 1 of 4 step(s) used — next 2026-11-17.
+PASS  and lists the steps as steps  — [["7 days after", "queued"], ["21 days after", "planned"]]
+PASS  a settled bill's screen says so, and says nothing is coming  — Settled — 1 message(s) went out about this bill.
+PASS  the chase is a job the practice can see, pause and run  — 8 jobs
+PASS  and it says when it runs and what it did last  — {"name": "overdue-chase", "label": "Chase unpaid invoices", "description": "One message per step of the practice's sched
+PASS  the messaging screen can read the chase rule back  — {"enabled": true, "offsetsDays": [-3, 0, 7, 21], "channels": ["sms", "email"]}
+
+clean-up
+PASS  the Twilio fixture gives back everything it created  — 
+  probe client removed
+  voided 15 probe document(s), reversed 5 probe payment(s); settings restored
+
+69 PASS / 0 FAIL
+
+
+===== reports_check.txt =====
+PASS  the workspace bootstraps the reports' sources  — 200 paymentTypes, seeded
+PASS  the reports endpoint answers  — window 2026-08-09 → 2026-11-06 (America/New_York)
+PASS  the overview carries every headline the gate names  — acquisition, attendance, costs, diary, earned, recalls
+PASS  an explicit range wins over any preset  — 2026-10-31 → 2026-11-06 · 7 day(s)
+PASS  the window is inclusive at both ends  — 7 days for 7 dates
+PASS  a preset resolves to the same shape of window, in the practice's timezone  — Last 30 days · 30 day(s)
+PASS  'this month' starts on the 1st, not 30 days back  — 2026-11-01
+PASS  a view that does not exist is refused, and says which exist  — 400 `view` must be one of: overview, revenue, utilisation, attendance, costs, attribution,
+PASS  a service and a practitioner exist to report on  — Annual service · Dana Whitfield
+PASS  a client record exists to report on  — 201 cli_4zt0ssx335
+PASS  the probe appointment lands with a practitioner and a service  — 201 bkg_da5debdeb8d2771f
+PASS  the imported visit is terminal (so it counts as seen, not just booked)  — completed
+PASS  the visit raises an invoice  — 201 
+PASS  the probe invoice is issued and settled  — INV-2273 · 32111 minor units · 201
+PASS  revenue answers for the window  — 200 · 117 invoice(s)
+PASS  the practitioner who did the work is credited with it  — Dana Whitfield: billed 646111 · collected 384511 vs probe 32111
+PASS  and the service is credited with it too  — Installation: 414000, Estimate: 338400, Annual service: 270111
+PASS  **the practitioners' shares add back up to everything billed**  — rows 1590811 vs billed 1590811
+PASS  **and the collected shares add back up to everything collected**  — rows 1159811 vs collected 1159811
+PASS  as does what is owed  — rows 431000 vs owed 431000
+PASS  **and the services' billed adds back up to the same total**  — rows 1590811 vs 1590811
+PASS  **and the services' collected adds back up to the same total**  — rows 1159811 vs 1159811
+PASS  **and the services' owed adds back up to the same total**  — rows 431000 vs 431000
+PASS  the money screen and the report are reading the same rows  — report 1159811 ≤ money 3801861 (the report's window is a subset of all time)
+PASS  booking an appointment moves the booked minutes by exactly its own length  — 5700 → 5760 for a 60 minute visit
+PASS  cancelling it gives the time back  — 5760 → 5700 (was 5700 before the booking)
+PASS  and the time is reported as cancelled rather than quietly lost  — cancelled 960 → 1020
+PASS  **utilisation is measured per practitioner, against their own rota**  — 3 practitioner(s) · 38640 rota minutes
+PASS  the percentage matches the minutes it was computed from  — 14.8% of 38640 minutes booked
+PASS  somebody on the rota has hours in this window  — Marcus Ito: 19320m, Dana Whitfield: 9660m, Priya Raman: 9660m
+PASS  a missed appointment is counted as a no-show  — 67 kept · 3 missed · 65 cancelled
+PASS  **the rate is the counts it was computed from, not a separate number**  — 4.3% of 70 kept-or-missed (expected 4.3%)
+PASS  the weekday that carried the no-show is the weekday it happened on  — Friday: 2, Thursday: 1, Wednesday: 0, Tuesday: 0
+PASS  attendance is broken down by the hour the appointments were in, in the practice's time  — 09:00, 10:00, 11:00, 13:00
+PASS  a practitioner's no-show rate is theirs, from their own appointments  — Priya Raman: 1/20, Dana Whitfield: 1/19, Marcus Ito: 0/28
+PASS  an expense appears under its own category  — supplies: 4250
+PASS  **total cost is practice spending plus call spend, added once**  — 25725 + 0 = 25725
+PASS  the call spend is itemised rather than one mystery number  — Platform: 0, Transcription: 0, Voice: 0
+PASS  margin is collected less cost — a subtraction anybody can check  — 1159811 − 25725 = 1134086
+PASS  every appointment in the window is counted once, under its own source  — 238 booking(s) across 4 source(s)
+PASS  the probe appointment is in the source it was booked through  — probe source 'client_api' · call:110, dashboard:63, online:43, client_api:22
+PASS  the assistant's share of the diary is a share of bookings, stated with them  — phone share 46.2% of 238
+PASS  the calls behind that share are counted, not estimated  — 840 handled / 1689 · 107 produced a booking
+PASS  **a client unseen past the practice's own recall window is on the list**  — 180-day window · overdue by 12 day(s)
+PASS  the days count from the last completed visit, not from the record being created  — last seen 192 day(s) ago for a 180-day window
+PASS  the client's own consent decides whether the practice may chase them  — reachable 0 · without consent 1
+PASS  the recall list is capped rather than unbounded, and still says how big it is  — 1 row(s) of 1 due
+PASS  **the export is a real CSV with a filename a bookkeeper can keep**  — 200 text/csv; charset=utf-8 · attachment; filename="revenue_2026-10-08_2026-11-06.csv"
+PASS  it parses, and its header is the report's own columns  — Group, Name, Visits, Invoiced, Collected
+PASS  the row count in the response is the row count in the file  — 11 promised vs 11 in the file
+PASS  the probe's money is in the file, as a decimal a spreadsheet understands  — Dana Whitfield: 6461.11
+PASS  a report that does not exist cannot be exported  — 400 `kind` must be one of: revenue, utilisation, attendance, costs, attribution,
+PASS  leaving with the numbers is written down in the workspace trail  — 200 · 1 export row(s) · "2026-10-08 \u2192 2026-11-06 \u2014 11 row(s), revenue_2026
+PASS  the front desk can read the practice's numbers  — 200 window 2026-08-09
+PASS  and can take a recalls list away to work through  — 200 'Client,Number,LastSeen,DaysSince,DaysOve'
+
+ALL PASS — who earns what, what it costs us and who does not turn up, from one window.
+
+
+===== report_tool_check.txt =====
+PASS  sign in as the owner  — session cookie
+PASS  the workspace is the demo practice  — Northwind Labs
+PASS  the workspace boots without an error  — status 200
+PASS  the appointment assistant is granted the report tool  — check_availability, book_appointment, transfer_call, reschedule_appointment, cancel_appointment, lookup_order, send_confirmation, draft_note, payment_status, create_payment_link, practice_report
+PASS  the tool is registered with a description a person can read  — Answer a member of the team about how the practice has been doing: app
+PASS  the team is listed  — 8 member(s)
+PASS  a mobile goes on the owner's record  — +14155556001
+PASS  and on the receptionist's  — +14155556002
+PASS  the team screen shows who the assistant will recognise  — jordan@northwind.dev=+14155556001, desk@northwind.dev=+14155556002
+PASS  a number that would never match a call is refused  — status 400
+PASS  one number cannot belong to two people  — status 409
+PASS  the owner is answered on the phone  — Last month: the practice billed $28,381.00 across 216 invoices and collected $22,002.50, leaving $6,378.50 out
+PASS  the answer is about the practice's money  — revenue
+PASS  and it is the same number the Reports screen shows  — billed 2838100 vs screen 2838100
+PASS  the assistant says it out loud rather than reading JSON  — Last month: the practice billed $28,381.00 across 216 invoices and collected $22,002.50, leaving $6,378.50 out
+PASS  and the figure it speaks is the figure on the screen  — spoken: Last month: the practice billed $28,381.00 across 216 invoices and collected $22
+PASS  "how many did we see last month" is answered as appointments  — appointments · Last month: 208 appointments on the books and 112 seen. By practitione
+PASS  "what's our no-show rate this month" is answered as attendance  — attendance · This month: 4 visits were seen and 0 people did not turn up — a no-sho
+PASS  "how busy were we last week" is answered as utilisation  — utilisation · 2026-10-26 → 2026-11-01: the diary ran at 5.4% of the hours the team w
+PASS  "where did our bookings come from" is answered as sources  — sources · This month: 24 appointments were booked, and the assistant took 25% of
+PASS  "who is overdue for a recall" is answered as recalls  — recalls · This month: 0 clients are past the 180-day recall. 0 have consent on f
+PASS  "how many calls did we handle" is answered as calls  — calls · This month: 198 calls, of which the assistant handled 91 end to end, 0
+PASS  the call figures match the screen's own outcome numbers  — handled 1051 vs 1051 · transferred 13 vs 13
+PASS  and they distinguish what the assistant handled from what it did not  — Last 90 days: 2170 calls, of which the assistant handled 1051 end to end, 13 went to a person and 1 failed. Th
+PASS  a number the practice does not know is refused  — unknown_caller
+PASS  the refusal is a sentence, not an error  — I can't share the practice's figures on this line — they're for the team. Happy to help with your own appointment, thoug
+PASS  and it leaks no figure at all  — I can't share the practice's figures on this line — they're for the team. Happy to help wi
+PASS  the receptionist gets the diary numbers  — utilisation
+PASS  but not the practice's money  — I can share the diary numbers with you, but the practice's money is owner and admin only. 
+PASS  and the refusal offers what they can have  — I can share the diary numbers with you, but the practice's money is owner and admin only. 
+PASS  a dashboard call answers as the signed-in person  — Jordan Reyes
+PASS  no client is named on any topic — 162 client names checked  — clean
+PASS  every answered question is in the audit trail  — 13 report.read entr(ies)
+PASS  so is every refusal  — 2 report.denied entr(ies)
+PASS  and a read says what was asked and who asked  — appointments · Last month · by number
+PASS  the check cleans up the calls it placed  — 15 call(s) removed
+
+36 PASS / 0 FAIL
+
+
+===== recall_check.txt =====
+
+D7 + A5 — recalls that act  (http://127.0.0.1:3000)
+
+— 0. the ground under the money loop
+PASS  the desk can sign in
+PASS  the practice's timezone is known  — America/New_York
+PASS  a settings change that omits the prefix keeps it  — {"currency": "USD", "invoicePrefix": "INV", "termsDays": 0, "defaultTaxRatePct": 0, "taxMode": "exclusive", "autoInvoice
+PASS  and the change it did make takes effect  — terms 0
+  note  using signed Twilio stub line +14155550999
+PASS  the practice's own window is set for the run  — 180
+
+— 1. the window belongs to the client, not the practice
+PASS  a service can carry its own interval  — {"name": "Probe Recall 30 230941", "recallDays": 30}
+PASS  and a service with none inherits the practice's  — {"name": "Probe Recall Inherit 230941", "recallDays": null}
+PASS  probe clients exist  — Probe Recall 230941 A · Probe Recall 230941 B · Probe Recall 230941 C
+PASS  a 30-day service puts a client on the list 90 days after a visit  — {"lastSeenDays": 90, "intervalDays": 30, "intervalSource": "service", "overdueDays": 60}
+PASS  the same 90 days does not recall an inherited window  — B listed: False · C window 180
+PASS  and a 200-day-old visit clears the practice's 180  — {"lastSeenDays": 200, "intervalDays": 180, "intervalSource": "practice", "overdueDays": 20}
+PASS  the sender's verdict rides with the row  — reachable=True blocked=None
+PASS  an appointment still to come does not reset the window  — last seen 90 days ago, next visit in 7
+PASS  and somebody with one booked is held rather than recalled  — already booked 2026-11-13
+PASS  the report honours a forced window  — interval 30
+PASS  and measures everybody by it, service or not  — {"clientId": "cli_buw3eeped1", "name": "Probe Recall 230941 B", "number": "+15552309412", "lastSeenAt": "2026-
+PASS  without the parameter it is the practice's own number  — 180
+PASS  the last-resort window reaches the loop as typed  — ruleFallbackDays=365
+PASS  the services strip names the interval each one uses  — [{"id": "svc_f6bd27128651934e", "name": "Annual service", "recallDays": null}, {"id": "svc_defbc1ffdaa2febc", "name": "Checkup", "
+
+— 2. recalls that act
+PASS  the loop ships switched off  — enabled=False
+PASS  and the job says so rather than sending  — {"orgId": "org_3b5dd38bbd095dd5", "queued": 0, "skipped": [], "blocked": [], "remaining": 0, "overrodeCooldown
+PASS  it can be switched on, with a ceiling and a cooldown  — {"enabled": true, "afterDays": 180, "channels": ["sms"], "cooldownDays": 90, "maxPerDay": 200}
+PASS  the desk can send one from the list  — 201 {"orgId": "org_3b5dd38bbd095dd5", "queued": 1, "skipped": [], "blocked": [], "remaining": 0, "overrodeCooldown
+PASS  it is queued, not sent behind the desk's back  — pending
+PASS  on the channel and the number the rule uses  — sms → +15552309411 (client +15552309411)
+PASS  and it carries the window it was judged by  — {"kind": "recall", "intervalDays": "30", "intervalSource": "service", "overdueDays": "60", "lastSeen": "2026-08-08", "serviceId": 
+PASS  the message itself is the workspace's own wording, with the booking link  — Hi Probe — it has been a while since your last job at Northwind Labs. Book when it suits you:
+https://pilot.example.test
+PASS  the run is on the record as the desk's, not the loop's  — recall-rule
+PASS  a batch cannot go over its ceiling  — {"queued": 0, "remaining": 1}
+PASS  pressing send twice is a duplicate, not a decision  — {"queued": 0, "skipped": [{"clientId": "cli_9vsln7nb6a", "name": "Probe Recall 230941 A", "reason": "a recall is already on the qu
+PASS  and the skip says the recall is already waiting  — [{"clientId": "cli_9vsln7nb6a", "name": "Probe Recall 230941 A", "reason": "a recall is already on the queue"}]
+PASS  the loop will not text somebody who is already on the queue  — [{"clientId": "cli_9vsln7nb6a", "name": "Probe Recall 230941 A", "reason": "a recall is already on the queue"}]
+PASS  the recall goes out  — {"status": "sent", "providerMessageId": "SMstub000235"}
+PASS  through the carrier, with an id to show for it  — SMstub000235
+PASS  the loop respects the cooldown  — {"queued": 0, "skipped": [{"clientId": "cli_9vsln7nb6a", "name": "Probe Recall 230941 A", "reason": "recalled 0 day(s) ago"}, {"cl
+PASS  the desk may overrule it for one person  — {"orgId": "org_3b5dd38bbd095dd5", "queued": 1, "skipped": [], "blocked": [], "remaining": 0, "overrodeCooldown": 1}
+PASS  and the run says it went past a cooldown the loop would have respected  — overrodeCooldown=1
+PASS  the screen can see which services carry their own interval  — [{"id": "svc_6d50b33d13e56653", "name": "Probe Recall 30 230941", "recallDays": 30}]
+PASS  and what today has already sent  — sent 3 · queued 1
+
+— 3. who is left alone, and who is refused
+PASS  somebody with an appointment in the diary is not recalled  — [{"clientId": "cli_vro8cdmmpk", "name": "Probe Recall 230941 D", "reason": "already booked 2026-11-09"}]
+PASS  somebody who said no is refused, by name  — [{"clientId": "cli_hqh7xcycxo", "name": "Probe Recall 230941 E", "reason": "Probe Recall 230941 E has opted out of sms"}]
+PASS  and the refusal says why  — [{"clientId": "cli_hqh7xcycxo", "name": "Probe Recall 230941 E", "reason": "Probe Recall 230941 E has opted out of sms"}]
+PASS  a blocked row is filed in their own record, not only in a log  — Probe Recall 230941 E has opted out of sms
+PASS  a rule that can only email does not text somebody with no email  — {"orgId": "org_3b5dd38bbd095dd5", "queued": 0, "skipped": [], "blocked": [{"clientId": "cli_10myrpma6o", "name": "Probe Recall 230
+PASS  and it says what it needed  — [{"clientId": "cli_10myrpma6o", "name": "Probe Recall 230941 F", "reason": "nothing to send to on the channels this rule uses (email)"}]
+PASS  the list refuses to recall somebody who is not overdue  — 409 1 of those clients are no longer due a recall — reload the list.
+
+— 4. quiet hours hold a recall until the window opens
+PASS  a recall asked for out of hours is queued, not sent  — {"orgId": "org_3b5dd38bbd095dd5", "queued": 1, "skipped": [], "blocked": [], "remaining": 0, "overrodeCooldown": 0}
+PASS  and it waits for the window to open  — sendAt 2026-11-07T00:00:42.434Z → 19:00 local (window opens 19)
+
+— 5. the reply comes back to the desk
+PASS  a forged recall reply is rejected  — 403 
+PASS  a signed inbound text from a recalled client is accepted  — 200 <?xml version="1.0" encoding="UTF-8"?><Response><Message>Tha
+PASS  and lands in the desk's own queue, against the right client  — [{"id": "out_f72f6c934c3fccf9", "at": "2026-11-06T23:09:42.457Z", "clientName": "Probe Recall 230941 G", "clientNumber": "+15552309417", "detail": "change requested: \"ye
+PASS  the desk can tick a reply off, from the desk's own login  — 200 {"resolved": "out_f72f6c934c3fccf9", "waiting": 0}
+PASS  and it is no longer waiting on anybody  — 0 still waiting
+PASS  ticking it off twice is harmless, not an error  — 200 waiting=0
+PASS  a reply that does not exist is refused, not ignored  — 404 No such request.
+PASS  and ticking one off still needs somebody signed in  — 401 Missing credentials. Send an API key in the Authorization header, or sign in.
+
+— 6. a silly number is taken seriously, not literally
+PASS  a window of 99,999 days is refused  — 400 `recallDays` must be between 1 and 3650 — it is the fallback window for every service.
+PASS  and so is zero  — 400 `recallDays` must be between 1 and 3650 — it is the fallback window for every service.
+PASS  a service cannot be given a negative interval  — 400 `recallDays` must be between 0 and 3650.
+PASS  or a word where a number belongs  — 400 `recallDays` must be a finite number.
+PASS  the practice's window survives all of it  — 180
+
+— 7. the loop the scheduler runs
+PASS  the daily recall loop is a job on the scheduler  — ["deliver-messages", "queue-reminders", "no-show-followups", "visit-followups", "overdue-chase", "recalls", "campaign-tick", "rete
+PASS  and it runs once a day  — Recall lapsed clients every 1440m
+PASS  running it actually recalls somebody  — 2 queued, 5 held
+PASS  and the second run queues nothing twice  — 7 held
+
+clean-up
+PASS  the Twilio fixture gives back everything it created
+PASS  no live probe document is left behind  — clean
+PASS  the recall loop is off again  — {"enabled": false, "channels": ["sms"], "cooldownDays": 90, "maxPerDay": 25, "practiceIntervalDays": 180, "ruleFallbackD
+
+ALL PASS — 68 checks: the window is per client, the list sends, and nothing goes out twice.
+
+
+===== leads_check.txt =====
+PASS  a stranger can submit the sales form  — HTTP 201
+PASS  a bad submission is refused with a reason  — HTTP 400
+PASS  the honeypot is thanked, not stored  — HTTP 201
+PASS  the inbox refuses anonymous callers  — HTTP 401
+PASS  the operator can sign in  — HTTP 200
+PASS  the submitted lead is in the inbox  — HTTP 200, 1 match(es)
+PASS  and the honeypot lead is not
+PASS  the pipeline counts it as new  — {'new': 4, 'contacted': 0, 'demo': 29, 'won': 0, 'lost': 0, 'total': 33}
+PASS  the lead moves along the pipeline  — HTTP 200
+PASS  and the work is written on the lead  — 2 log line(s)
+PASS  a status that does not exist is refused  — HTTP 400
+PASS  a lead that does not exist is a 404  — HTTP 404
+
+ALL PASS
+
+
+===== workspace_export_check.txt =====
+PASS  the export refuses anonymous callers  — HTTP 401
+PASS  the owner can sign in  — HTTP 200
+PASS  the owner can export the workspace  — HTTP 200
+PASS  it arrives as a download  — attachment; filename="voxera-workspace-northwind-labs-2026-1
+PASS  the file says what it is
+PASS  it contains clients  — 207 rows
+PASS  it contains bookings  — 472 rows
+PASS  it contains calls  — 2162 rows
+PASS  it contains invoices  — 413 rows
+PASS  it contains assistants  — 3 rows
+PASS  the counts are the rows
+PASS  every row belongs to this workspace
+PASS  it leaves sessions behind
+PASS  it leaves authTokens behind
+PASS  it leaves rateBuckets behind
+PASS  it leaves salesLeads behind
+PASS  no secret travels in the clear  — 0 leaked
+PASS  the export is written into the audit trail
+
+ALL PASS
+
+
+===== growth_check.txt =====
+PASS  the funnel refuses anonymous callers  — HTTP 401
+PASS  the operator can sign in  — HTTP 200
+PASS  the funnel answers  — HTTP 200
+PASS  the stages are in order
+PASS  the funnel only narrows  — [8, 3, 3, 1, 1, 1, 1]
+PASS  the percentages add up
+PASS  time to first call is never negative  — 0
+PASS  a stranger can sign up  — HTTP 201
+PASS  the funnel counts the new workspace  — 8 → 9
+PASS  at the first stage only  — {'signed_up': (8, 9), 'assistant_created': (3, 3), 'assistant_published': (3, 3), 'number_connected': (1, 1), 'first_call': (1, 1), 'first_booking': (1, 1), 'first_payment': (1, 1)}
+PASS  the signup lands in the weekly series  — {'week': '2026-11-02', 'signups': 8}
+
+ALL PASS
+
+
+===== pack_check.txt =====
+packs check against http://127.0.0.1:3000
+
+PASS  the packs list refuses anonymous callers
+PASS  the desk can put a class in the service list
+PASS  the desk can schedule a class session
+PASS  a one-to-one service refuses a pack  — 400 Annual service is not a class service (capacity under 2) — a pack buys places in a class.
+PASS  a pack product can be priced on the class  — 201 
+PASS  a client exists to hold the pack
+PASS  the pack can be bought  — 201 
+PASS  four places, none spent, none held  — spent=0 held=0 left=4
+PASS  the purchase is a prepayment fenced to the pack  — prepayment
+PASS  no invoice exists yet — no class has happened  — 0 invoice(s)
+PASS  the holder can be added to the class  — 201 
+PASS  the seat holds a place — money unmoved  — held=1 spent=0
+PASS  a hold spends nothing
+PASS  the roster shows the seat is on the pack  — held
+PASS  attendance spends the place  — spent=1
+PASS  the seat's invoice is the per-place share, paid  — total=2500 status=paid
+PASS  undoing the mark un-spends the place  — spent=0 held=1
+PASS  and voids the seat's invoice  — void
+PASS  and the money is back in the pack
+PASS  a no-show burns the place  — spent=1 left=3
+PASS  a stranger's seat does not hold the pack  — held=0
+PASS  a second session exists for the release test
+PASS  the new seat holds again  — held=1
+PASS  giving it back early releases the place — not spent, not burned  — held=0 spent=1 left=3
+PASS  the refund pays back only the unspent places  — 200 refunded=7500 
+PASS  and closes the pack  — refunded
+PASS  and the pack's money can no longer be spent  — 0
+PASS  a second refund is refused  — 409 That pack has already been refunded.
+PASS  the liability line answers  — 0
+
+ALL PASS (29 checks)
+
+
+===== demo_check.txt =====
+PASS  sign in as the owner  — session cookie
+PASS  the workspace is a two-site practice  — Northwind East — New York, Northwind HQ — San Francisco
+PASS  today's diary has a day in it  — 7 visit(s) on 2026-11-06
+PASS  today's visit lifecycle agrees with the clock  — 0 still due · cancelled, completed
+PASS  the most recent finished day reads like a day that happened  — 4 closed visit(s) on 2026-11-05
+PASS  the month behind the diary reads like a month that happened  — 82 settled visit(s) in the last thirty finished days
+PASS  and most of it turned up  — 72 of 82 attended (88%) over the seeded month
+PASS  the bookings API returns the workspace's diary  — 200 appointment(s)
+PASS  both sites have appointments  — Northwind East — New York: 100 · Northwind HQ — San Francisco: 90
+PASS  the diary offers both sites  — Northwind East — New York, Northwind HQ — San Francisco
+PASS  filtering to Northwind East — New York returns only that site  — 0 leak(s)
+PASS  filtering to Northwind HQ — San Francisco returns only that site  — 0 leak(s)
+PASS  every sampled visit is inside the practitioner's hours  — 40 checked
+PASS  nobody is booked during their lunch break  — 40 checked
+PASS  no room holds two visits at once  — 3 room(s) checked
+PASS  most seeded visits know which room they are in  — 175 of 190 seeded visits
+PASS  every appointment in the last 30 days names a practitioner and a service  — 0 of 52 unattributed
+PASS  the practice has billed work in the last 30 days  — 15,587.00
+PASS  and collected most of it  — 11,302.00 of 15,587.00
+PASS  revenue is attributed to named practitioners  — Dana Whitfield, Marcus Ito, Priya Raman
+PASS  nothing is filed under Unassigned except a sprinkle  — nothing unassigned
+PASS  and every named practitioner's row counts their appointments  — Dana Whitfield 46, Marcus Ito 71, Priya Raman 51
+PASS  attendance has a denominator worth reading  — 69 kept-or-missed
+PASS  the no-show rate is plausible  — 2.9% of 69
+PASS  bookings arrive from more than one place  — Phone / assistant 110, Front desk 63, Online booking page 43, Your other system 22
+PASS  the practice checklist is there for a new owner  — 7 step(s), 7/7 done
+PASS  every step says what to do, why, and where  — booking, desk, first-visit, hours, people, rooms, services
+PASS  the checklist ticks only what the workspace really has  — every step agrees with its own records
+PASS  the demo practice runs classes  — 3 upcoming session(s) of 3
+PASS  and people are in them  — Group session 10:30am 2/6, Group session 10:30am 2/6, Group session 3:00pm 2/2
+PASS  every session names its instructor, its site and a room  — Hudson Room, Bay Room, Hudson Room
+PASS  the roster counts the demo class's places, and nobody is here before the day  — {"capacity": 6, "seats": 2, "confirmed": 2, "arrived": 0, "completed": 0, "noShow": 0, "free": 4, "attended": 0}
+PASS  the demo has a full class with somebody in line  — Group session 3:00pm 2/2 · 1 waiting
+PASS  and the line is names in an order, not a count  — 1 in line: ['Devin Osei']
+PASS  the public page sells places in them  — 3 class(es) offered
+PASS  and a full class is offered as a queue rather than hidden  — [('Group session', 0, True)]
+PASS  with the places left said out loud  — Group session — 4 left, no names of who is in it
+PASS  a class day is on the practitioner's day view at all  — checked 2 class day(s)
+PASS  a class seat is not counted as an hour of the practitioner's day  — 2026-11-10 Northwind East — New York: 9 seat(s), 0 booked minute(s), 2026-11-11 Northwind East — New York: 2 seat(s), 0 booked minute(s)
+PASS  every practitioner has rota hours in the window  — 3 with capacity
+PASS  the diary is busy but not full  — 14.4%, 15.9%, 16.2%
+
+ALL PASS — the demo reads as a practice that has been running for a month: two sites, a live diary, legal hours, single-occupancy rooms, and books with money in them.
+
+
+===== privacy_check.txt =====
+PASS  the mirror strips the practice collections  — assistants, calls, widgets
+PASS  everything else is still mirrored  — 3 key(s) kept
+PASS  a record under an innocent key is still caught  — state.recentlyViewed[0].dateOfBirth, state.recentlyViewed[0].consents, state.recentlyViewed[0] (looks like a client record)
+PASS  a record with no telltale field name is caught by its shape  — state.recent[0] (looks like a client record)
+PASS  a clean payload is cacheable
+PASS  a payload with a birth date is not
+PASS  the collection list is not empty  — 11 collection(s)
+PASS  the store never hydrates a dashboard blob from browser storage
+PASS  and throws the legacy blob away rather than keeping any of it
+PASS  the store never writes dashboard state to browser storage
+PASS  workspace state is hydrated from the authenticated server sync
+PASS  no practice screen reads or writes browser storage  — 4 screens clean
+PASS  the rule is documented where the screens can find it
+PASS  preferences may only be written under declared keys
+PASS  a preference cannot carry a record
+PASS  screens go through the preference module, not the storage API  — none
+PASS  the privacy toggle is a preference, not a record
+PASS  signed in to check the running product
+PASS  there are records on file to look for  — 164 client(s)
+PASS  there is something unique to look for  — 365 fingerprint(s), 13 already in the source tree
+PASS  no record is baked into the served dashboard pages  — 365 fingerprint(s) searched for
+PASS  no record is compiled into the shipped bundles  — 71 bundle(s), 365 fingerprint(s)
+
+ALL PASS — practice records stay on the server, and the browser cache cannot hold them.
+
+
+===== guard-check.txt =====
+— outbound URL policy ——————————————————————————
+PASS  blocks loopback  — http://127.0.0.1:3000/api/auth/me → 127.0.0.1 is a private or loopback address
+PASS  blocks cloud metadata  — http://169.254.169.254/latest/meta-data/ → 169.254.169.254 is a private or loopback address
+PASS  blocks private range  — http://10.1.2.3/hook → 10.1.2.3 is a private or loopback address
+PASS  blocks home range  — http://192.168.0.10/hook → 192.168.0.10 is a private or loopback address
+PASS  blocks private range  — http://172.16.4.4/hook → 172.16.4.4 is a private or loopback address
+PASS  blocks IPv6 loopback  — http://[::1]:3000/hook → ::1 is a private or loopback address
+PASS  blocks IPv6 unique local  — http://[fd00::1]/hook → fd00::1 is a private or loopback address
+PASS  blocks localhost name  — http://localhost:4010/hook → localhost resolves locally
+PASS  blocks internal TLD  — http://metadata.google.internal/computeMetadata → metadata.google.internal resolves locally
+PASS  blocks non-http protocol  — ftp://example.com/hook → unsupported protocol ftp — use http or https
+PASS  blocks credentials in URL  — http://user:pass@example.com/hook → credentials in the URL are not accepted
+PASS  blocks not a URL  — not a url → not a valid absolute URL
+PASS  allows a public host
+PASS  refuses a private target before it is even dialled  — Outbound request blocked: 127.0.0.1 is a private or loopback address
+PASS  opt-out allows loopback for a local demo
+
+— media secret ————————————————————————————————
+PASS  no secret in production means no signing
+PASS  no token is minted without a secret
+PASS  a secret mints a verifiable token  — 1794010240691.nPa-z1bmL5…
+
+— metering ————————————————————————————————————
+PASS  a call decrements the organisation balance  — 60 → 57.5
+PASS  usage accumulates alongside it  — 0 → 2.5
+      restored Growth Check 1794006609 to balance 60 / used 0
+
+— retention ———————————————————————————————————
+PASS  expired sessions are swept  — {"sessions":1,"webhookDeliveries":6,"rateBuckets":16,"remindersQueued":0,"noShowFollowUps":0,"visitFollowUps":0,"messagesSent":0,"messagesBlocked":0}
+PASS  live sessions are kept
+
+GUARD CHECK: ALL PASS
+
+
+===== race-check.txt =====
+starting two writers against the postgres store …
+wrote 10 app rows + 1 worker row; the postgres store contains 10 app rows, worker row: yes
+RACE CHECK: PASS — a flush inside the pending window no longer discards the other writer.
+
+
+===== number-ownership-check.txt =====
+PASS  two processes reach the reservation barrier — exit=0, exit=0
+PASS  exactly one concurrent reservation wins — [{"worker":"a","ok":true,"reservation":{"createdAt":"2026-11-06T23:10:52.182Z","id":"ncl_067c9057d125fc5d","orgId":"org_race_a","number":"+14155558888","carrierId":"car_a","operation":"adopt","expiresAt":"2026-11-06T23:20:52.182Z"}},{"worker":"b","ok":false,"conflict":{"id":"ncl_067c9057d125fc5d","orgId":"org_race_a","number":"+14155558888","carrierId":"car_a","createdAt":"2026-11-06T23:10:52.182Z","expiresAt":"2026-11-06T23:20:52.182Z","operation":"adopt","carrierSid":"pending","status":"claiming"}}]
+PASS  the loser observes the deployment-global owner — org_race_a vs org_race_a
+PASS  postgres contains one pending owner after the cross-process race — 1 row(s)
+PASS  an expired reservation is swept and the exact number can be retried — {"ok":true,"reservation":{"createdAt":"2026-11-06T23:10:52.209Z","id":"ncl_7d64f83eb23f1906","orgId":"org_after_expiry","number":"+14155558888","carrierId":"car_after_expiry","operation":"purchase","expiresAt":"2026-11-06T23:20:52.209Z"}}
+PASS  expiry cleanup removes the stale row instead of accumulating claims — [{"createdAt":"2026-11-06T23:10:52.209Z","id":"ncl_7d64f83eb23f1906","orgId":"org_after_expiry","number":"+14155558888","carrierId":"car_after_expiry","operation":"purchase","expiresAt":"2026-11-06T23:20:52.209Z"}]
+PASS  releasing a failed operation reservation permits an exact retry — {"ok":true,"reservation":{"createdAt":"2026-11-06T23:10:52.211Z","id":"ncl_f74fcba0ec536d83","orgId":"org_after_compensation","number":"+14155558888","carrierId":"car_after_compensation","operation":"adopt","expiresAt":"2026-11-06T23:20:52.211Z"}}
+PASS  the storage index rejects a second active E.164 owner
+PASS  routing resolves to one active owner after the collision — ["org_owner_a"]
+PASS  explicit release permits a new active owner
+PASS  released history is excluded from inbound routing — ["org_owner_b:active"]
+
+11 PASS / 0 FAIL
+
+
+===== endpoint-probe.txt =====
+endpoint probe — mode=live against http://127.0.0.1:3000
+PASS  the workspace has an order tool to point somewhere  —  tools=15
+PASS  it can be pointed at our own endpoint  —  http://127.0.0.1:3000/api/webhook-echo
+SKIP  this deployment forbids private outbound calls (`VOXERA_ALLOW_PRIVATE_OUTBOUND` is unset).
+      The built-in executor answers instead — run this probe against a local demo to see the endpoint path.
+
+LIVE-ENDPOINT PROBE: SKIPPED (locked-down deployment)
+
+
+===== room_window_check.txt =====
+181 window(s) checked · 0 disagreement(s) between the picker and the clash check
+
+
+===== media-check.txt =====
+PASS  dashboard login  — status 200
+PASS  assistant available  — Support concierge
+PASS  call created  — call_ea44d52338ad
+PASS  media status endpoint  — frame 20ms
+PASS  status reports transcriber honestly
+PASS  websocket upgraded
+PASS  received media frames from the agent  — 123 frames
+PASS  every frame is a 20 ms μ-law frame  — sizes 160
+PASS  agent audio starts within a second of the greeting
+PASS  turn events reached the socket  — 5 turns
+PASS  caller transcripts reached the socket  — 5 finals
+PASS  barge-in cleared playback  — 3 clear, 2 mark
+PASS  socket stayed open for the call  — code 1000
+PASS  call record has caller turns  — 5 caller turns
+PASS  call record has agent replies  — 6 agent turns
+PASS  media facts written to the call  — 358 frames, 4 utterances
+PASS  call is no longer in progress  — status ended
+
+conversation:
+  agent   Thanks for calling Northwind — this is Voxera, the AI assistant on the line. I can help with
+  caller  Hi, I need to check on my order please.
+  agent   I checked and I do not have anything on file for this number. If you give me the day you boo
+  caller  It was supposed to arrive on Tuesday and it has not shown up.
+  agent   I want to make sure I get this right — you mentioned "It was supposed to arrive on Tuesday a
+  caller  Yes please, that is the right order.
+  agent   I checked and I do not have anything on file for this number. If you give me the day you boo
+  caller  Can you book me an appointment for Thursday at 2pm instead?
+  agent   I don't have anything free on that day — would another day suit you?
+  caller  No that is everything, thanks for your help.
+
+worker notes: Cannot speak: no text-to-speech provider configured. | Caller interrupted the agent — playback cleared. | Cannot speak: no text-to-speech provider configured. | Cannot speak: no text-to-speech provider configured. | Caller interrupted the agent — playback cleared.
+
+ALL CHECKS PASS
+
+
+===== nesting-check.txt =====
+scanned 106 prerendered pages
+no invalid nesting found
+
+
+===== linkcheck.txt =====
+106 static routes · 0 unresolvable link targets
+
+
+===== sitemap-check.txt =====
+sitemap entries: 16  ·  prerendered routes: 145  ·  redirects: 39
+every indexable prerendered route is listed
+
+
+===== offer_expiry_probe.txt =====
+offer expiry probe — apply — sqlite store
+  two offers to age  : wo_expiryprobe_1794006707945_aged_open, wo_expiryprobe_1794006707945_aged_past
+  one to leave alone : wo_expiryprobe_1794006707945_live (stands until 2026-11-07T02:11:47.945Z)
+  the entry behind the first one wants 2026-11-08 → 2026-11-15
+  backup: /home/user/voxera/data/backups/voxera-store.before-expiry-probe-2026-11-06T23-11-47-946Z.json.gz
+  the first offer's slot, in the clinic's words: Monday 9 November at 6:11pm
+PASS  the sweeper closed both aged offers  — closed 2
+PASS  an aged offer is closed, not deleted  — expired
+PASS  and the closing says why  — nobody took it in time
+PASS  its entry goes back in the queue while its window is open  — waiting
+PASS  an entry whose own window has gone does not go back in the queue  — expired
+PASS  an offer still inside its window is left alone  — open
+PASS  the desk can still see everything that happened  — 3 rows
+PASS  the audit trail records the closures  — waitlist.offer_expired
+  probe rows removed; the workspace is as it was (backup kept above)
+
+8 PASS / 0 FAIL
+
+
+===== store-replace-check.txt =====
+  PASS — running outside the project directory (/tmp/voxera-replace-HM9siC)
+  PASS — the engine under test is the one the app runs (sqlite)
+  store        : adding the age-order column (one pass over the store)…
+  store        : age order in place over 0 rows
+  PASS — the store wrote into this directory (data/voxera-db.sqlite)
+  PASS — six documents went in (6)
+  PASS — every document that should survive did (5)
+  PASS — the edited collection kept both rows (2)
+  PASS — an untouched collection survived too (3)
+  PASS — a collection emptied on purpose stays empty (0)
+  PASS — the edit itself was written (renamed)
+  PASS — the API reads the replaced store back (2 row(s))
+
+  10 passed, 0 failed — a replace keeps the store it was handed.
+

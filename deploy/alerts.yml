@@ -1,0 +1,103 @@
+# Starter alerts. Tune thresholds from staging measurements before the pilot.
+groups:
+  - name: voxera
+    rules:
+      - alert: VoxeraDown
+        expr: up{job="voxera"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Voxera is not answering scrapes
+          description: The process, host, or private monitoring path has been unavailable for two minutes.
+
+      - alert: VoxeraHealthFailing
+        expr: probe_success{job="voxera-blackbox"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Voxera health is not 200
+          description: Requires a blackbox exporter probing /api/health; commonly indicates PostgreSQL/readiness failure.
+
+      - alert: VoxeraBackupFailed
+        expr: voxera_backup_ok == 0
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: The most recent PostgreSQL backup failed
+          description: Check the backup container, PostgreSQL connectivity, pg_dump version and destination capacity.
+
+      - alert: VoxeraBackupStale
+        expr: time() - voxera_backup_last_success_timestamp_seconds > 28800
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: Voxera backup is older than eight hours
+          description: The default schedule is every six hours. Also verify that the resulting archive has left the VPS.
+
+      - alert: VoxeraBackupMissing
+        expr: absent(voxera_backup_last_success_timestamp_seconds)
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: Voxera has never reported a backup
+          description: The always-on backup service may be stopped or unable to share /app/data/backups/status.json with the app.
+
+      - alert: VoxeraSchedulerErrors
+        expr: increase(voxera_scheduler_errors_total[10m]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: Voxera scheduler ticks are throwing
+          description: Reminder and message work may be skipped; inspect the owning instance and provider errors.
+
+      - alert: VoxeraHTTPErrorRate
+        expr: >-
+          sum(rate(voxera_http_requests_total{class="5xx"}[5m]))
+            / clamp_min(sum(rate(voxera_http_requests_total[5m])), 0.001) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Voxera is returning 5xx on more than 5% of requests
+          description: Sustained server errors require build ID, route and PostgreSQL/provider correlation.
+
+      - alert: VoxeraSlowRequests
+        expr: voxera_http_request_duration_ms_p99 > 1500
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: Voxera p99 latency is over 1.5 seconds
+          description: Check same-VPS PostgreSQL latency, locks, synchronous event-loop blocking and provider calls.
+
+      - alert: VoxeraEventLoopDelayHigh
+        expr: voxera_event_loop_delay_ms_p99 > 200
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Voxera event-loop p99 delay is over 200 ms
+          description: The metric covers the interval since the previous scrape. Check synchronous PostgreSQL latency, CPU pressure, large responses and provider calls.
+
+      - alert: VoxeraEventLoopSaturated
+        expr: voxera_event_loop_utilization_ratio > 0.90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Voxera event-loop utilization is over 90%
+          description: The process has little event-loop headroom; stop pilot expansion and inspect request mix, PostgreSQL latency and CPU allocation.
+
+      - alert: VoxeraMemoryPressure
+        expr: voxera_process_resident_memory_bytes > 1258291200
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Voxera resident memory is over 1.2 GiB
+          description: This leaves less than 20% headroom under the default 1536 MiB app limit. Inspect heap/native growth before the OOM killer restarts the process.

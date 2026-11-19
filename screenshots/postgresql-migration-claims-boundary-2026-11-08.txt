@@ -1,0 +1,8 @@
+
+> voxera@1.0.0 migrate:postgres
+> tsx scripts/migrate-to-postgres.ts --apply
+
+source sqlite: 124462 documents across 59 collections
+target postgres: 0 documents across 0 collections
+migrated and verified 124462 documents across 59 collections (counts + SHA-256 content digests)
+Keep the source store and pre-migration PostgreSQL backup until the staging acceptance suite passes.

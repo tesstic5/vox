@@ -1,0 +1,88 @@
+
+> voxera@1.0.0 check:claims
+> python3 scripts/marketing-claims-check.py
+
+PASS retired source absent: PLAN.md
+PASS retired source absent: lib/blog.ts
+PASS retired source absent: lib/careers.ts
+PASS retired source absent: lib/compare.ts
+PASS retired source absent: lib/compare
+PASS retired source absent: lib/customer-stories.ts
+PASS retired source absent: lib/deep-dives.ts
+PASS retired source absent: lib/deep-dives
+PASS retired source absent: lib/docs.ts
+PASS retired source absent: lib/docs-content
+PASS retired source absent: lib/glossary.ts
+PASS retired source absent: lib/integrations.ts
+PASS retired source absent: lib/integrations
+PASS retired source absent: lib/legal.ts
+PASS retired source absent: lib/playground-data.ts
+PASS retired source absent: lib/posts
+PASS retired source absent: lib/providers.ts
+PASS retired source absent: lib/releases.ts
+PASS retired source absent: lib/sitemap-data.ts
+PASS retired source absent: lib/status.ts
+PASS retired source absent: lib/stories
+PASS retired source absent: lib/templates.ts
+PASS retired source absent: lib/templates
+PASS retired source absent: lib/trust.ts
+PASS retired source absent: components/docs
+PASS retired source absent: components/site/BlogChrome.tsx
+PASS retired source absent: components/site/BlogIndex.tsx
+PASS retired source absent: components/site/CliView.tsx
+PASS retired source absent: components/site/CustomersDirectory.tsx
+PASS retired source absent: components/site/DeepDiveBlocks.tsx
+PASS retired source absent: components/site/GlossaryIndex.tsx
+PASS retired source absent: components/site/IntegrationsDirectory.tsx
+PASS retired source absent: components/site/LibraryView.tsx
+PASS retired source absent: components/site/PlatformTabs.tsx
+PASS retired source absent: components/site/PricingTable.tsx
+PASS retired source absent: components/site/TemplatesGallery.tsx
+PASS legacy route redirects safely: app/(site)/ai-voice-agents/page.tsx -> /platform
+PASS legacy route redirects safely: app/(site)/blog/page.tsx -> /docs
+PASS legacy route redirects safely: app/(site)/blog/[slug]/page.tsx -> /docs
+PASS legacy route redirects safely: app/(site)/blog/author/[slug]/page.tsx -> /docs
+PASS legacy route redirects safely: app/(site)/blog/authors/page.tsx -> /docs
+PASS legacy route redirects safely: app/(site)/blog/category/[slug]/page.tsx -> /docs
+PASS legacy route redirects safely: app/(site)/blog/page/[page]/page.tsx -> /docs
+PASS legacy route redirects safely: app/(site)/blog/tag/[slug]/page.tsx -> /docs
+PASS legacy route redirects safely: app/(site)/careers/[slug]/page.tsx -> /careers
+PASS legacy route redirects safely: app/(site)/changelog/page.tsx -> /docs
+PASS legacy route redirects safely: app/(site)/changelog/[release]/page.tsx -> /docs
+PASS legacy route redirects safely: app/(site)/cli/page.tsx -> /docs
+PASS legacy route redirects safely: app/(site)/compare/page.tsx -> /platform
+PASS legacy route redirects safely: app/(site)/compare/[slug]/page.tsx -> /platform
+PASS legacy route redirects safely: app/(site)/creators/page.tsx -> /contact
+PASS legacy route redirects safely: app/(site)/custom-agents/page.tsx -> /platform
+PASS legacy route redirects safely: app/(site)/customers/[slug]/page.tsx -> /customers
+PASS legacy route redirects safely: app/(site)/enhanced-security/page.tsx -> /security
+PASS legacy route redirects safely: app/(site)/glossary/page.tsx -> /docs
+PASS legacy route redirects safely: app/(site)/glossary/[term]/page.tsx -> /docs
+PASS legacy route redirects safely: app/(site)/gpt-live-waitlist/page.tsx -> /platform
+PASS legacy route redirects safely: app/(site)/hackathon/page.tsx -> /contact
+PASS legacy route redirects safely: app/(site)/industries/page.tsx -> /solutions
+PASS legacy route redirects safely: app/(site)/industries/[slug]/page.tsx -> /solutions
+PASS legacy route redirects safely: app/(site)/integrations/page.tsx -> /platform
+PASS legacy route redirects safely: app/(site)/integrations/[slug]/page.tsx -> /platform
+PASS legacy route redirects safely: app/(site)/legal/[slug]/page.tsx -> /legal
+PASS legacy route redirects safely: app/(site)/library/page.tsx -> /docs
+PASS legacy route redirects safely: app/(site)/partnerships/page.tsx -> /contact
+PASS legacy route redirects safely: app/(site)/playbook/page.tsx -> /docs
+PASS legacy route redirects safely: app/(site)/sales/page.tsx -> /contact
+PASS legacy route redirects safely: app/(site)/single-prompt/page.tsx -> /platform
+PASS legacy route redirects safely: app/(site)/solutions/[slug]/page.tsx -> /solutions
+PASS legacy route redirects safely: app/(site)/startups/page.tsx -> /pricing
+PASS legacy route redirects safely: app/(site)/templates/page.tsx -> /dashboard/assistants/new
+PASS legacy route redirects safely: app/(site)/templates/[slug]/page.tsx -> /dashboard/assistants/new
+PASS legacy route redirects safely: app/(site)/trust/page.tsx -> /security
+PASS legacy route redirects safely: app/(site)/trust/questionnaire/page.tsx -> /security
+PASS legacy route redirects safely: app/(site)/twist/page.tsx -> /platform
+PASS legacy route redirects safely: app/(site)/vapicon/page.tsx -> /
+PASS legacy route redirects safely: app/(site)/vapicon/speakers/page.tsx -> /
+PASS legacy route redirects safely: app/(site)/vapicon-2026-speaker-submissions/page.tsx -> /
+PASS legacy route redirects safely: app/docs/[...slug]/page.tsx -> /docs
+PASS scanned 228 user-visible source files for affirmative unsupported claims
+PASS search index contains no retired catalogue routes
+PASS sitemap contains no retired catalogue routes
+
+82 checks passed / 0 failed

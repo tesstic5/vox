@@ -1,0 +1,2 @@
+sitemap entries: 16  ·  prerendered routes: 145  ·  redirects: 39
+every indexable prerendered route is listed

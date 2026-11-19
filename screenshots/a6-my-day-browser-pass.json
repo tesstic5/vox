@@ -1,0 +1,207 @@
+{
+ "checks": [
+  {
+   "label": "signed in",
+   "pass": true,
+   "detail": "jordan@northwind.dev (voxera_session)"
+  },
+  {
+   "label": "the pass starts from an unlinked login",
+   "pass": true,
+   "detail": true
+  },
+  {
+   "label": "the cookie notice is answered like a person would",
+   "pass": true,
+   "detail": "Accept all"
+  },
+  {
+   "label": "an unlinked login is told so, in the page, not in an empty day",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "label": "every practitioner record is offered as a claim",
+   "pass": true,
+   "detail": "3 candidates"
+  },
+  {
+   "label": "“This is me” turns the login into a diary",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "label": "the page is titled for what it is",
+   "pass": true,
+   "detail": "My day"
+  },
+  {
+   "label": "and names whose day it is",
+   "pass": true,
+   "detail": "Priya Raman"
+  },
+  {
+   "label": "free time is shown against bookable time",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "label": "the next few days hold a diary to read",
+   "pass": true,
+   "detail": "1 visit(s) on 2026-11-09"
+  },
+  {
+   "label": "appointments are on the page",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "label": "a visit with no room is flagged rather than hidden",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "label": "the gap line quotes the whole stretch the API reported",
+   "pass": true,
+   "detail": "free · 90 min (free 90 min, 90 min bookable)"
+  },
+  {
+   "label": "and its sub-line quotes the bookable part, not the whole stretch",
+   "pass": true,
+   "detail": "90 min"
+  },
+  {
+   "label": "no horizontal overflow on a 390 px viewport",
+   "pass": true,
+   "detail": "0px"
+  },
+  {
+   "label": "“Next 3 days” widens the view",
+   "pass": true,
+   "detail": "3 day(s) in the window"
+  },
+  {
+   "label": "an owner can read a colleague’s day, and it says so",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "label": "the day reads on a desk screen too",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "label": "/dashboard loads without a console error",
+   "pass": true,
+   "detail": "Overview"
+  },
+  {
+   "label": "/dashboard/notifications loads without a console error",
+   "pass": true,
+   "detail": "Workspace notices"
+  },
+  {
+   "label": "/dashboard/clients loads without a console error",
+   "pass": true,
+   "detail": "Customers"
+  },
+  {
+   "label": "/dashboard/money loads without a console error",
+   "pass": true,
+   "detail": "Money"
+  },
+  {
+   "label": "/dashboard/board loads without a console error",
+   "pass": true,
+   "detail": "Staff board"
+  },
+  {
+   "label": "/dashboard/team loads without a console error",
+   "pass": true,
+   "detail": "Team & roles"
+  },
+  {
+   "label": "/dashboard/calls loads without a console error",
+   "pass": true,
+   "detail": "Calls"
+  },
+  {
+   "label": "/dashboard/assistants loads without a console error",
+   "pass": true,
+   "detail": "Assistants"
+  },
+  {
+   "label": "/dashboard/numbers loads without a console error",
+   "pass": true,
+   "detail": "Phone numbers"
+  },
+  {
+   "label": "/dashboard/analytics loads without a console error",
+   "pass": true,
+   "detail": "Analytics"
+  },
+  {
+   "label": "/dashboard/billing loads without a console error",
+   "pass": true,
+   "detail": "Billing & usage"
+  },
+  {
+   "label": "/dashboard/my-day loads without a console error",
+   "pass": true,
+   "detail": "My day"
+  },
+  {
+   "label": "/dashboard/logs loads without a console error",
+   "pass": true,
+   "detail": "Request logs"
+  },
+  {
+   "label": "/dashboard/settings loads without a console error",
+   "pass": true,
+   "detail": "Settings"
+  },
+  {
+   "label": "the notification delivery boundary is reachable",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "label": "the inbox does not present unwired delivery preferences",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "label": "the implementation guide renders in a browser",
+   "pass": true,
+   "detail": "Follow the records that exist."
+  },
+  {
+   "label": "and carries the provider-verification boundary",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "label": "no hydration mismatch anywhere in the chrome",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "label": "no 404s from the dashboard’s own requests",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "label": "nothing else upset the page",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "label": "the login is unlinked again, as the workspace was handed over",
+   "pass": true,
+   "detail": "day.linked=false"
+  }
+ ],
+ "consoleNoise": [],
+ "failures": [],
+ "at": "2026-11-09T10:57:35.885Z"
+}
